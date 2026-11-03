@@ -33,3 +33,9 @@ This file covers the PD adaptation against upstream/fork baseline `2be141b` (202
 - Clarified oil-temperature unavailability: no usable value found in the AVN receive path, so not implemented for this vehicle.
 - Clarified that the confirmed vehicle is not fitted with e-LSD; that feature is unavailable.
 - These corrections use the owner's report received on2026-11-03; no new agent-operated vehicle test, source or APK change was performed.
+
+## PD-only documentation cleanup — 2026-11-03
+
+- Removed duplicated upstream guides, archived README/release/validation snapshots and five upstream documentation images from the current tree to prevent confusion with PD observations.
+- Rewrote build/translation instructions for this Fork and kept the PD installation, validation and build-provenance documents. Updated companion setup and all remaining document links.
+- Preserved upstream commit history, LICENSE, copyright/NOTICE and dependency rights. Application logic, APKs and app resources remain unchanged; legacy tool help points to the original external JSN guides.

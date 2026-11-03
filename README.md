@@ -2,7 +2,7 @@
 
 Unofficial i30 PD adaptation of [reikop/veloster-n-dashboard](https://github.com/reikop/veloster-n-dashboard). [한국어](README_ko.md)
 
-This fork adds a PD-specific receive decoder and dashboard presentation. Original commits, the unchanged [MIT LICENSE](LICENSE), and upstream notices are retained. Upstream README and validation/release records are preserved under [docs/upstream](docs/upstream/README.md); their Veloster N observations are historical and do not establish PD compatibility.
+This fork adds a PD-specific receive decoder and dashboard presentation. Original commits, the unchanged [MIT LICENSE](LICENSE), and upstream notices are retained. Only PD-specific project documentation is included in the current tree. Original author documentation and screenshots are available in the [upstream repository](https://github.com/reikop/veloster-n-dashboard), rather than duplicated here.
 
 ## Confirmed target and scope
 
@@ -16,7 +16,7 @@ Current PD artifact: [N-Dashboard-v11-PD-API17.apk](apks/N-Dashboard-v11-PD-API1
 python3 scripts/verify_release.py
 ```
 
-[PD installation and launch](docs/INSTALL_PD.md) explains target checks, backups and ADB commands. The inherited `scripts/install.py` and OEM menu tools remain **JSN-profile tools**, not PD installers. They select upstream JSN artifacts; this fork does not publish modified OEM menu APKs. My Apps v10 is retained unchanged as an optional upstream companion, with its own upstream test limits.
+[PD installation and launch](docs/INSTALL_PD.md) explains target checks, backups and ADB commands. The inherited `scripts/install.py` and OEM menu tools remain **JSN-profile tools**, not PD installers. They select upstream JSN artifacts; this fork does not publish modified OEM menu APKs. My Apps v10 is retained unchanged as an optional upstream companion. Its configuration and PD limitations are described in the PD installation guide.
 
 APKs use the public AOSP platform test certificate for compatibility. It is not a private publisher identity. No signing private keys are included. See [NOTICE.md](NOTICE.md) and [release.json](release.json).
 

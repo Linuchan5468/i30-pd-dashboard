@@ -404,7 +404,7 @@ def main(argv=None):
         print("STOPPED: " + str(error), file=sys.stderr)
         if args.action in ("install", "restore"):
             print("Keep the bundle and backup receipt. No blind rollback or reboot was attempted.", file=sys.stderr)
-            print("For an interrupted menu install, use restore with the SAME bundle and a NEW --backup directory; see docs/MENU_ENTRY.md.", file=sys.stderr)
+            print("For an interrupted JSN menu install, use restore with the SAME bundle and a NEW --backup directory; original guide: https://github.com/reikop/veloster-n-dashboard/blob/2be141b/docs/MENU_ENTRY.md.", file=sys.stderr)
         return 1
 
 
