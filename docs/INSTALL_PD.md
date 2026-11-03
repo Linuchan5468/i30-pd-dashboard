@@ -33,6 +33,15 @@ adb -s SERIAL shell am start -n com.veloster.dashboard/.DashboardActivity
 
 Check the actual screen and values while parked. An accepted command does not prove useful telemetry. Signature mismatch/unsupported target requires investigation; no permission-policy bypass is provided. The app retains package name `com.veloster.dashboard` to preserve the tested update path.
 
-The factory launcher may hide sideloaded apps. Use an existing reachable launcher or the unchanged optional My Apps companion. For optional companion behavior see the upstream [Quick entry guide](QUICK_ENTRY.md); its reboot/shortcut test limitations apply. **The inherited `scripts/install.py`/OEM menu profile targets JSN and does not install PD v11.** Neither this APK nor this PR creates a PD OEM menu entry. Do not apply the inherited JSN OEM menu procedure to PD.
+The factory launcher may hide sideloaded apps. Use an existing reachable launcher or the unchanged optional My Apps v10 companion. To install and request opening that companion while parked:
+
+```sh
+adb -s SERIAL install -r apks/My-Apps-v10-API17.apk
+adb -s SERIAL shell am start -n com.veloster.carplayhub/.HubActivity
+```
+
+Its Quick entry setting is opt-in: choose Floating + notification, save, then verify HOME → edge button → My Apps → N Dashboard on the actual screen. If no usable shortcut appears, retain ADB access or use your existing launcher. The owner's dashboard cold-boot confirmation does not separately validate every My Apps shortcut/boot-restoration behavior.
+
+**The retained `scripts/install.py`/OEM menu profile targets JSN and does not install PD v11.** Neither dashboard nor companion APK creates a PD OEM menu entry. The JSN OEM menu procedure is outside this PD guide.
 
 No PC is needed for the app's existing receive path after launch. The owner confirmed app execution and retained settings after a cold boot. Automatic full-screen launch at boot is not implied by that confirmation. No new ADB or vehicle operation was performed to prepare this public PR.

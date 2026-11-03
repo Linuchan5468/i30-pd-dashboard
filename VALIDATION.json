@@ -3,7 +3,7 @@
   "publication_date": "2026-11-03",
   "historical_vehicle_date": "2026-10-29",
   "upstream_base_commit": "2be141b",
-  "upstream_records": "docs/upstream/VALIDATION.json",
+  "upstream_records": "https://github.com/reikop/veloster-n-dashboard/blob/2be141b/VALIDATION.json",
   "target": {
     "vehicle": "one Korean i30 PD N Line DCT7",
     "product": "pd_kr",

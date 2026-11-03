@@ -2,7 +2,7 @@
 
 [reikop/veloster-n-dashboard](https://github.com/reikop/veloster-n-dashboard)를 기반으로 i30 PD에 맞춰 수정한 비공식 대시보드입니다. [English](README.md)
 
-원본 커밋 이력과 [MIT LICENSE](LICENSE)를 유지하며 [NOTICE](NOTICE.md)에 출처·외부 의존성을 기재했습니다. 원본 설명과 당시 검증 기록은 [docs/upstream](docs/upstream/README_ko.md)에 보존했습니다. 원본의 Veloster N 검증 결과와 이 Fork의 PD 결과를 구분합니다.
+원본 커밋 이력과 [MIT LICENSE](LICENSE)를 유지하며 [NOTICE](NOTICE.md)에 출처·외부 의존성을 기재했습니다. 현재 파일 트리에는 PD용 문서만 제공합니다. 원작자의 설명·검증 문서와 사진·미리보기 이미지는 중복 게시하지 않으며 [원본 저장소](https://github.com/reikop/veloster-n-dashboard)에서 확인할 수 있습니다.
 
 ## 확인된 차량
 
@@ -16,7 +16,7 @@
 python3 scripts/verify_release.py
 ```
 
-[PD 설치·실행 안내](docs/INSTALL_PD.md)를 따르세요. 기존 `scripts/install.py`와 OEM 메뉴 도구는 **JSN 전용 프로필**을 유지하며 PD 자동 설치 도구가 아닙니다. 변경된 OEM 메뉴 APK는 배포하지 않습니다. My Apps v10은 수정 없이 남긴 원본의 선택형 보조 앱이며, 원본 기록의 미검증 항목도 그대로 적용됩니다.
+[PD 설치·실행 안내](docs/INSTALL_PD.md)를 따르세요. 기존 `scripts/install.py`와 OEM 메뉴 도구는 **JSN 전용 프로필**을 유지하며 PD 자동 설치 도구가 아닙니다. 변경된 OEM 메뉴 APK는 배포하지 않습니다. My Apps v10은 수정 없이 남긴 선택형 보조 앱입니다. 설정 방법과 PD 확인 범위는 PD 설치 안내에 정리했습니다.
 
 APK는 호환성을 위해 공개 AOSP platform 테스트 인증서로 서명돼 있습니다. 배포자의 비밀 신원 인증서가 아니며 개인키는 포함하지 않습니다. [배포 목록·해시](release.json)와 [NOTICE](NOTICE.md)를 함께 확인하세요.
 

@@ -1,65 +1,47 @@
-> PD Fork: 현재 계기판 소스는 v11 / 2.0-pdkr, Hub는 수정 없는 upstream v10입니다. 아래 일반 빌더는 서명 전 APK를 생성하며, 설치 검증된 v11은 공개 v6의 프로젝트 리소스를 유지하고 자체 소스를 JDK21/Java8→D8로 다시 컴파일한 파일입니다. 원본 설치·메뉴 도구는 JSN 전용입니다. [PD 검증](PD_VALIDATION.md)을 우선하세요.
+# PD 소스 빌드와 테스트
 
-# 공개 소스 빌드와 테스트
-
-## 설치 파일과 빌드 결과 구분
-
-바로 설치할 파일은 `apks/`의 기존 서명된 배포본입니다. 아래 공개 빌더는 **서명 전 APK**까지만 만듭니다. 개인키·OEM SDK 구현·순정 APK·차량 로그가 필요하거나 포함되지 않으며 차량에 연결하지 않습니다.
-
-새 코드를 실제 차량에 설치하려면 해당 기기가 허용하는 서명과 Android 4.2 호환 V1 서명 형식이 필요합니다. 아무 로컬 키로 서명하면 되는 것으로 확인하지 않았습니다. 기존 설치본 업데이트에는 서명 일치도 필요합니다. 이 배포에는 키 발급·OTA 서명·차량 신뢰정책 변경 기능이 없습니다.
+이 문서는 i30 PD Fork의 v11 / 2.0-pdkr와 선택형 My Apps v10 소스에 적용합니다. 설치·실행은 [PD 설치 안내](INSTALL_PD.md), 대상과 실차 확인 범위는 [PD 검증 기록](PD_VALIDATION.md)을 참고하세요.
 
 ## 준비물
 
-- Python 3.9 이상과 JDK 17 또는 21 (`java`, 같은 디렉터리의 `javac`).
-- 외부 Android SDK `android.jar` API 16 또는 17. 공개 준비 검증은 기존 API 16 JAR로 컴파일하고 min/target SDK는 17로 지정했습니다.
-- AAPT2 실행 파일과 D8가 포함된 R8 JAR. 도구는 사용자 설치 경로를 인자로 전달하며 이 폴더에 배포하지 않습니다.
+- Python 3.9 이상, JDK 17 또는21의 `java`·`javac`.
+- 외부 Android SDK의 API16 또는17 `android.jar`.
+- AAPT2 실행 파일과 D8가 포함된 R8 JAR.
 
-소스는 Java 8 언어/클래스 수준으로 컴파일하고 D8 `--min-api 17`을 사용합니다. 제조사 API 선언은 별도 클래스 디렉터리에 컴파일해 javac의 classpath에만 넣고, 앱 DEX에 패키징하지 않습니다. 실제 실행에는 차량의 OEM `automotive` 라이브러리가 필요합니다.
+외부 도구·SDK·개인키는 저장소에 포함하지 않습니다. `compile-stubs/`의 최소 OEM 선언은 컴파일 classpath에만 사용하고 앱 DEX에 패키징하지 않습니다. 실행에는 대상 AVN에 설치된 `automotive` 프레임워크가 필요합니다. Java8 입력을 D8 `--min-api17`로 변환하며 DEX035를 사용합니다.
 
-## 호스트 테스트
+## 호스트 검사
+
+JDK의 bin을 PATH에 추가해 Python의 Java 서비스 검사에서도 사용할 수 있게 합니다.
 
 ```sh
-python3 scripts/test.py --java /path/to/jdk17/bin/java
+python3 scripts/test.py --java /path/to/jdk/bin/java
 python3 -m unittest discover -s tests -p 'test_*.py'
+python3 scripts/generate_translations.py --check
 python3 scripts/verify_release.py
 ```
 
-테스트는 임시 폴더에서 컴파일하고 끝나면 삭제합니다. Telemetry 유효성·60초 만료·TPMS·추가 신호·프레임 분할/오류 처리와 Bluetooth/무선 시험/재시작의 상태 정책을 검사합니다. 합성 입력만 사용하며 실차 로그, Android 실행 환경, ADB가 필요하지 않습니다. UI·실제 Bluetooth 하드웨어·실차 통신을 재현하는 테스트는 아닙니다.
+이 검사는 합성 입력과 작은 Android 스텁을 사용하며 차량·ADB·원시 캡처를 요구하지 않습니다. 실차 센서 정확도나 외부 하드웨어 동작을 대신 검증하지 않습니다. 공개 준비 당시 Java 프로그램15개, Python 검사44개가 통과했습니다.
 
-## 빌드
+## 서명 전 APK 생성
 
-공개 폴더에서 아래 `/path/to/...`를 본인의 도구 경로로 바꿉니다. 기존 출력 폴더는 덮어쓰지 않으므로 다시 빌드할 때 새 `--out`을 지정합니다.
+아래 도구 경로를 실제 경로로 바꾸고 새 출력 폴더를 지정합니다.
 
 ```sh
 python3 scripts/build.py dashboard \
-  --java /path/to/jdk17/bin/java \
+  --java /path/to/jdk/bin/java \
   --android-jar /path/to/android.jar \
   --aapt2 /path/to/aapt2 \
   --r8-jar /path/to/r8.jar \
-  --out build/dashboard
-
-python3 scripts/build.py hub \
-  --java /path/to/jdk17/bin/java \
-  --android-jar /path/to/android.jar \
-  --aapt2 /path/to/aapt2 \
-  --r8-jar /path/to/r8.jar \
-  --out build/hub
+  --out build/pd-dashboard
 ```
 
-결과는 각각 `dashboard-UNSIGNED.apk`, `hub-UNSIGNED.apk`입니다. APK의 리소스·DEX 구성은 확인하지만 ZIP 정렬과 서명은 수행하지 않습니다. 기존 배포본과 바이트 단위 재현을 보장하지 않습니다. 도구 버전·타임스탬프·서명 과정이 영향을 줍니다.
+My Apps는 `dashboard` 대신 `hub`, 별도 `--out` 경로를 사용합니다. 결과는 `dashboard-UNSIGNED.apk` 또는 `hub-UNSIGNED.apk`이며 그대로 설치할 수 없습니다. API17 호환 V1/JAR 서명과 ZIP 정렬은 별도로 수행해야 합니다. 기존 앱 업데이트에는 서명 일치가 필요합니다. 공개 APK의 AOSP 테스트 인증서와 외부 도구의 권리·한계는 [NOTICE](../NOTICE.md)를 확인하세요.
 
-배포 APK는 API 17, DEX 035, V1/JAR 서명 형식입니다. V2 전용 서명은 Android 4.2에 맞지 않습니다. 서명 배경은 [AOSP 앱 서명 문서](https://source.android.com/docs/security/features/apksigning)를 참고하세요. 새 서명본의 설치 성공과 차량 동작은 별도 검증해야 합니다.
+배포 v11은 실제 설치·재읽기 해시가 일치한 APK입니다. 공개 소스를 JDK21/Java8→D8로 다시 컴파일한 DEX가 이 APK의 DEX와 바이트 일치했습니다. 당시 공개 v6의 프로젝트 리소스를 유지한 매니페스트·리소스 페이로드도 일치했습니다. 자세한 내용은 [빌드 출처](PD_BUILD_PROVENANCE.json)에 있습니다. 일반 AAPT2 리소스 재생성 경로는 공개 준비 때 다시 실행하지 않았으며 전체 ZIP·서명 메타데이터의 동일 재현을 보장하지 않습니다.
 
-## 공개 폴더를 유지할 때
+## 배포 파일과 문서 갱신
 
-개인키, 원본 차량 로그/스크린샷, VIN·기기 일련번호·페어링 주소, 순정 APK/ODEX/펌웨어, 개인 백업은 추가하지 않습니다. `build/`, `private-backups/`, 키 확장자는 `.gitignore`에 제외되어 있습니다. 새 바이너리를 배포하면 `release.json`, `SHA256SUMS`, `VALIDATION.json`과 확인 범위를 함께 갱신합니다.
+현재 PD 설치 파일은 `apks/N-Dashboard-v11-PD-API17.apk`입니다. 남아 있는 이전 JSN APK는 이력·출처 확인용이며 PD 설치 권장 파일이 아닙니다. 기존 JSN 설치·메뉴 스크립트의 프로필 제한은 유지합니다.
 
-## 실행 바로가기와 선택형 메뉴 도구
-
-현재 Hub 소스는 v10이며 부팅 시 직접 켜 둔 바로가기만 복원합니다. 호스트 검사는 실제 서비스·리시버를 작은 Android 스텁과 실행하지만 실제 차량 표시/부팅 전달을 대신하지 않습니다.
-
-[단일 설치 명령](INSTALL.md)은 Python 표준 라이브러리와 ADB만 사용합니다. 빌드 도구나 키가 필요하지 않습니다. [선택형 OEM 메뉴 재구성](MENU_ENTRY_ko.md)에만 별도 JDK·Androguard·smali·개인 원본이 필요합니다. 관련 소스는 `menu-entry/`와 `scripts/build_menu_entry.py`이며, 외부 키를 받아 해당 로컬 메뉴 APK를 서명하는 경로입니다. OEM 코드가 포함된 생성물을 공개하지 않습니다.
-
-다국어 문자열은 `translations/en.json`, `ko.json`을 수정하고 `python3 scripts/generate_translations.py`로 Java 카탈로그를 갱신합니다. 빌더는 카탈로그 일치 여부를 검사하고 `res/values`, `res/values-ko`의 앱 이름 리소스도 컴파일합니다. 현재 Fork 소스는 계기판 v11·내 앱 v10에 대응합니다.
-
-공개 준비에서 v11 전체 소스를 재컴파일한 DEX와 기존 프로젝트 리소스 기반 페이로드가 설치본과 바이트 일치했습니다. [빌드 출처](PD_BUILD_PROVENANCE.json). 일반 AAPT2 리소스 재생성 경로는 이번 공개 준비에서 다시 실행하지 않았습니다.
+새 파일을 배포하면 `release.json`, `SHA256SUMS`, `VALIDATION.json`, `SOURCE_SHA256SUMS`와 확인 범위를 함께 갱신합니다. 개인키·OEM 구현·펌웨어·원시 차량 캡처·식별자·개인 설정 및 백업은 추가하지 않습니다. 라이선스·저작권·외부 의존성 고지는 유지합니다.
