@@ -66,6 +66,30 @@ public final class HscanFrameDecoderTest {
             decoder.accept(value, 0, 264, 2);
             check(count[0] == ++before, "allowlisted function " + function);
         }
+        final int[] pdCount={0};
+        HscanFrameDecoder pd=new HscanFrameDecoder(new HscanFrameDecoder.Sink(){
+            public void record(int function,byte[] data,long at){pdCount[0]++;}
+        },true);
+        byte[] pdRpm=frame(8,new byte[8]),pdSpeed=frame(2,new byte[4]);
+        for(int i=0;i<264;i++)pd.accept(pdRpm,i,1,3000);
+        pd.accept(pdSpeed,0,264,3000);
+        check(pdCount[0]==2,"PD RPM and speed accepted across fragmented reads");
+        pd.accept(good,0,264,3000);pd.accept(frame(2,new byte[8]),0,264,3000);
+        check(pdCount[0]==2,"PD profile rejects JSN functions and wrong PD lengths");
+        byte[] pdBad=pdSpeed.clone();pdBad[200]=1;checksum(pdBad);
+        pd.accept(pdBad,0,264,3000);
+        check(pdCount[0]==2,"PD complete-batch padding validation retained");
+        for(int function:new int[]{0,9,0x0a,0x0b,0x0d,0x13,0x14,0x19,0x1d,0x1e}){
+            int beforePd=pdCount[0];byte[] extra=frame(function,new byte[function==0x19?5:8]);
+            pd.accept(extra,0,264,3001);check(pdCount[0]==beforePd+1,"PD extra allowlist "+function);
+            byte[] wrong=frame(function,new byte[function==0x19?8:5]);pd.accept(wrong,0,264,3002);
+            check(pdCount[0]==beforePd+1,"PD exact extra length "+function);
+        }
+        int beforeStates=pdCount[0];byte[] states=frame(0x1c,new byte[4]);pd.accept(states,0,264,3003);
+        check(pdCount[0]==beforeStates+1,"PD system state frame exact length");
+        int beforeTires=pdCount[0];byte[] tires=frame(0x20,new byte[6]);pd.accept(tires,0,264,3004);
+        check(pdCount[0]==beforeTires+1,"PD TPMS frame length6");
+        pd.accept(frame(0x20,new byte[8]),0,264,3005);check(pdCount[0]==beforeTires+1,"PD rejects wrong TPMS length");
         System.out.println("PASS " + checks + " synthetic HSCAN decoder checks");
     }
 }

@@ -1,10 +1,21 @@
 {
-  "release_date": "2026-10-26",
-  "scope": "Veloster N JSN KR Android API17; tested build eng.vmadmin.20250902.081552",
+  "release_date": "2026-11-03",
+  "scope": "PD fork: one Korean i30 PD N Line DCT7, pd_kr / eng.vmadmin.20260114.084130; legacy JSN artifacts retained",
   "license": "MIT (project-authored code only)",
   "signer_certificate_sha256": "c8a2e9bccf597c2fb6dc66bee293fc13f2fc47ec77bc6b2b0d52c11f51192ab8",
   "signing_note": "Public AOSP platform test certificate; not a private publisher identity or OTA signing key. No private keys distributed.",
   "apks": [
+    {
+      "file": "apks/N-Dashboard-v11-PD-API17.apk",
+      "package": "com.veloster.dashboard",
+      "version_code": 11,
+      "version_name": "2.0-pdkr",
+      "sha256": "d3614615cbb10c79e87a800d79eef245e32a8677d05e083de357d457b94b686d",
+      "bytes": 67050,
+      "vehicle_install_observed": true,
+      "installer_profile": "pd_kr",
+      "scope": "2026-10-29 installed/readback-matched. Owner subsequently confirmed cold-boot app execution/settings retention, P/R/N/D1–D7 and individual TCS/ESC ON/OFF behavior (report received2026-11-03). Oil unavailable from AVN receive path; vehicle has no e-LSD. Earlier capture/replay evidence remains separately documented."
+    },
     {
       "file": "apks/N-Dashboard-v6-API17.apk",
       "package": "com.veloster.dashboard",
@@ -66,7 +77,7 @@
       "scope": "Historical installed release; no universal compatibility claim."
     }
   ],
-  "release_tag": "v2026.10.26-i18n",
+  "release_tag": null,
   "languages": [
     "ko",
     "en"

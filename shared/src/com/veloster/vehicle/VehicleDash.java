@@ -136,6 +136,7 @@ public final class VehicleDash extends View implements Runnable {
         VehicleDash d=current.get();if(d!=null)regulation(d.activity,blocked);
     }
     public static void ignition(boolean on) { DATA.clear(); }
+    public static void profilePd(boolean value){DATA.pdProfile(value);}
     public static void rpm(byte[] data) { DATA.rpm(data,SystemClock.elapsedRealtime()); }
     public static void beginComputed(float rpm,float tqi,float acor,float standard,float boost,float ambient) { DATA.beginComputed(rpm,tqi,acor,standard,boost,ambient); }
     public static void computed(float power,float torque,float boostKpa) { DATA.computed(power,torque,boostKpa); }
@@ -146,6 +147,7 @@ public final class VehicleDash extends View implements Runnable {
     public static void rearView(int data) { DATA.rearView(data); }
     public static void units(byte[] data) { DATA.units(data,SystemClock.elapsedRealtime()); }
     public static void speed(int data) { DATA.speed(data,SystemClock.elapsedRealtime()); }
+    public static void hscanPd(int cid,int function,byte[] data,long receivedAt){DATA.hscanPd(cid,function,data,receivedAt);}
     public static void additional(byte[] data) { DATA.additional(data,SystemClock.elapsedRealtime()); }
     public static void hscanJsn(int cid,int funcLow,byte[] data){DATA.hscanJsn(cid,funcLow,data,SystemClock.elapsedRealtime());}
     public static void hscanJsn(int cid,int funcLow,byte[] data,long receivedAt){DATA.hscanJsn(cid,funcLow,data,receivedAt);}

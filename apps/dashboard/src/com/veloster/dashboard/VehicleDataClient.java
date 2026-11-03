@@ -37,6 +37,7 @@ final class VehicleDataClient implements Runnable {
             power=(BCMManager)com.hkmc.VehicleInfoManager.getInstance(context).getService(com.hkmc.VehicleInfoManager.BCM_SERVICE);
             if(power==null)throw new IllegalStateException("BCM service unavailable");
             ignition=power.getIGNStatus();
+            android.util.Log.i("NDashboard","ignition="+ignition+" product="+android.os.Build.PRODUCT);
             plistener=new BCMPowerListener(){public void onIgnitionChanged(boolean on){
                 synchronized(VehicleDataClient.this){
                 if(!active||token!=generation)return;
@@ -57,7 +58,7 @@ final class VehicleDataClient implements Runnable {
                 public void onPowerTorqueTurboBoostReceived(byte[] b){if(accepts(token)){VehicleDash.rpm(b);VehicleDash.calculateObserved();}}
                 public void onGForceDataReceived(byte[] b){if(accepts(token)){VehicleDash.gforce(b);VehicleDash.calculateObserved();}}
                 public void onOilCoolantTemperature(byte[] b){if(accepts(token))VehicleDash.temperatures(b);}
-                public void onSpeedTempUnitTempReceived(byte[] b){if(accepts(token))VehicleDash.units(b);}
+                public void onSpeedTempUnitTempReceived(byte[] b){if(accepts(token)&&!HscanDataClient.pdProfile())VehicleDash.units(b);}
                 public void onNAddInfoReceived(byte[] b){if(accepts(token))VehicleDash.additional(b);}
                 // Some OEM app subclasses declare this; captured250902 base/proxy lacks dispatch.
                 public void onNModeZeroSpeedChanged(byte[] b){if(accepts(token))VehicleDash.wheels(b);}
@@ -66,7 +67,7 @@ final class VehicleDataClient implements Runnable {
         }catch(RuntimeException e){nmode=null;log("NMode",e);}catch(LinkageError e){nmode=null;log("NMode",e);}
         if(vehicle==null)try{
             vehicle=new VehicleInfoManager(context);
-            vlistener=new VehicleInfoListener(){public void onVehicleSpeedChanged(int speed){if(accepts(token))VehicleDash.speed(speed);}};
+            vlistener=new VehicleInfoListener(){public void onVehicleSpeedChanged(int speed){if(accepts(token)&&!HscanDataClient.pdProfile())VehicleDash.speed(speed);}};
             vehicle.addListener(vlistener);
         }catch(RuntimeException e){vehicle=null;log("speed",e);}catch(LinkageError e){vehicle=null;log("speed",e);}
         if(rear==null)try{

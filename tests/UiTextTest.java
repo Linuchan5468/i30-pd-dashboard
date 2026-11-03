@@ -17,6 +17,10 @@ public final class UiTextTest {
         UiText.configure("en","ko");
         check("N Dashboard".equals(UiText.t("N 계기판")),"dashboard label translated");
         check("Quick entry".equals(UiText.t("실행 바로가기 / Quick entry")),"quick entry translated");
+        check("Accelerator pedal".equals(UiText.t("가속 페달")),"accelerator pedal is distinct from throttle");
+        check("TCS enabled".equals(UiText.t("TCS 사용 상태"))&&"ESC enabled".equals(UiText.t("ESC 사용 상태"))
+            &&"ABS warning".equals(UiText.t("ABS 경고등")),"PD enabled and ABS-warning labels do not imply intervention");
+        check("Pedal".equals(UiText.t("가속 페달 / PEDAL")),"compact English pedal label fits its column");
         String[] english=UiText.list(Telemetry.LABELS);
         for(String label:english)check(!label.matches(".*[가-힣].*"),"English signal label: "+label);
         english[0]="changed copy";
@@ -26,6 +30,7 @@ public final class UiTextTest {
         UiText.configure("ko","en");
         check("N 계기판".equals(UiText.t("N 계기판")),"manual Korean roundtrip");
         check("저장".equals(UiText.t("저장 / Save")),"legacy bilingual key renders one language");
+        check("가속 페달".equals(UiText.t("가속 페달 / PEDAL")),"compact Korean pedal label is explicit");
         check(Locale.getDefault().equals(system),"display choice must not alter the system/numeric locale");
         System.out.println("PASS: language fallback/override, signal labels, metadata and locale isolation");
     }

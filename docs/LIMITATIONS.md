@@ -1,3 +1,5 @@
+> PD Fork: 이 문서는 upstream JSN 프로필의 기록/도구 안내입니다. PD 사용자는 [PD 설치 안내](INSTALL_PD.md)와 [현재 검증 범위](PD_VALIDATION.md)를 우선하세요. JSN OEM 메뉴 절차를 PD에 적용하지 마세요.
+
 # 지원 범위와 한계
 
 ## 호환성과 검증

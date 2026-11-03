@@ -55,18 +55,19 @@ def main():
         abi = out / "compile-only-abi"
         abi.mkdir()
         stubs = sorted((ROOT / "compile-stubs" / "src").rglob("*.java"))
-        run("compile-abi", [javac, "-encoding", "UTF-8", "-source", "7", "-target", "7",
+        run("compile-abi", [javac, "-encoding", "UTF-8", "-source", "8", "-target", "8",
                             "-classpath", sdk, "-d", abi, *stubs])
         classpath = os.pathsep.join((str(sdk), str(abi)))
         sources += sorted(p for p in shared.rglob("*.java") if p.name != "UsbDebugControl.java")
     else:
         sources.append(shared / "com/veloster/vehicle/UsbDebugControl.java")
         sources += sorted((shared / "com/veloster/i18n").rglob("*.java"))
-    run("javac", [javac, "-encoding", "UTF-8", "-source", "7", "-target", "7",
+    run("javac", [javac, "-encoding", "UTF-8", "-source", "8", "-target", "8",
                   "-classpath", classpath, "-d", classes, *sources])
     # Only app classes enter D8; compile-only OEM declarations never enter the APK.
+    abi_options = ["--classpath", abi] if args.app == "dashboard" else []
     run("d8", [java, "-cp", r8, "com.android.tools.r8.D8", "--min-api", "17",
-               "--lib", sdk, "--output", out, *sorted(classes.rglob("*.class"))])
+               "--lib", sdk, *abi_options, "--output", out, *sorted(classes.rglob("*.class"))])
     dex = out / "classes.dex"
     if dex.read_bytes()[:8] != b"dex\n035\0":
         raise SystemExit("Unexpected DEX version; API17 requires DEX035")

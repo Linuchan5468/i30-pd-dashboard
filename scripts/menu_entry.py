@@ -111,7 +111,9 @@ def load_apps(root=ROOT):
     release = read_json(root / "release.json")
     apps = {}
     for package in COMPANIONS:
-        entries = [e for e in release["apks"] if e["package"] == package]
+        # This inherited installer is gated by the original JSN profile.
+        entries = [e for e in release["apks"] if e["package"] == package
+                   and e.get("installer_profile", "jsn_kr") == "jsn_kr"]
         require(bool(entries), "Release is missing companion: " + package)
         current = max(entries, key=lambda item: int(item["version_code"]))
         path = contained(root, current["file"])

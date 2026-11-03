@@ -1,3 +1,5 @@
+> PD Fork: 이 문서는 upstream JSN 프로필의 기록/도구 안내입니다. PD 사용자는 [PD 설치 안내](INSTALL_PD.md)와 [현재 검증 범위](PD_VALIDATION.md)를 우선하세요. JSN OEM 메뉴 절차를 PD에 적용하지 마세요.
+
 # Current release: v2026.10.26-i18n — prerelease
 
 My Apps **v10 / 1.9-i18n** and N Dashboard **v6 / 1.5-i18n** add Korean/English display text, system-language defaults, per-app saved selection, localized launcher labels, and live language refresh for the edge shortcut/notification. [Language guide](LANGUAGES.md).

@@ -13,12 +13,22 @@ import java.util.ArrayDeque;
 final class HscanDataClient {
     interface Gate { boolean accepts(); }
     private final Gate gate;
+    static boolean pdProfile() {
+        return "pd_kr".equals(android.os.Build.PRODUCT)
+            && "eng.vmadmin.20260114.084130".equals(android.os.Build.VERSION.INCREMENTAL);
+    }
+    private final boolean pd = pdProfile();
     private Session session;
     HscanDataClient(Gate gate) { this.gate = gate; }
 
     synchronized void start() {
-        if (session != null || !"jsn_kr".equals(android.os.Build.PRODUCT)
-            || !"eng.vmadmin.20250902.081552".equals(android.os.Build.VERSION.INCREMENTAL)) return;
+        if (session != null) return;
+        if (!pd && !("jsn_kr".equals(android.os.Build.PRODUCT)
+            && "eng.vmadmin.20250902.081552".equals(android.os.Build.VERSION.INCREMENTAL))) {
+            android.util.Log.w("NDashboard", "HSCAN unsupported product/build");
+            return;
+        }
+        android.util.Log.i("NDashboard", "HSCAN start profile=" + (pd ? "PD" : "JSN"));
         session = new Session();
         session.decoder.start();
         session.reader.start();
@@ -45,6 +55,8 @@ final class HscanDataClient {
         private volatile boolean active = true;
         private LocalSocket socket;
         private long sequence;
+        private volatile long receivedBytes;
+        private long records, lastStatus;
         final Thread reader, decoder;
 
         Session() {
@@ -75,6 +87,7 @@ final class HscanDataClient {
                     try {
                         current.connect(new LocalSocketAddress("hscan_mux", LocalSocketAddress.Namespace.ABSTRACT));
                         current.setSoTimeout(500); // API17 needs connect before setting options.
+                        android.util.Log.i("NDashboard", "HSCAN connected");
                         InputStream input = current.getInputStream();
                         while (active) {
                             int n;
@@ -82,6 +95,7 @@ final class HscanDataClient {
                             catch (SocketTimeoutException idle) { continue; }
                             if (n < 0) break;
                             if (n == 0) continue;
+                            receivedBytes += n;
                             Chunk chunk = new Chunk(buffer, n, SystemClock.elapsedRealtime(), ++sequence);
                             synchronized (queue) {
                                 if (!active) break;
@@ -91,7 +105,7 @@ final class HscanDataClient {
                             }
                         }
                     } catch (IOException unavailable) {
-                        // No diagnostic/handshake fallback; readings expire normally.
+                        if (active) android.util.Log.w("NDashboard", "HSCAN receive unavailable", unavailable);
                     } finally {
                         synchronized (socketLock) {
                             closeSocket(current);
@@ -108,10 +122,19 @@ final class HscanDataClient {
             HscanFrameDecoder parser = new HscanFrameDecoder(new HscanFrameDecoder.Sink() {
                 public void record(int function, byte[] data, long receivedAt) {
                     synchronized (delivery) {
-                        if (active && gate.accepts()) VehicleDash.hscanJsn(0xc7, function, data, receivedAt);
+                        if (active && gate.accepts()) {
+                            if (pd) VehicleDash.hscanPd(0xc7, function, data, receivedAt);
+                            else VehicleDash.hscanJsn(0xc7, function, data, receivedAt);
+                            records++;
+                            if (receivedAt - lastStatus >= 5000) {
+                                lastStatus = receivedAt;
+                                android.util.Log.i("NDashboard", "HSCAN profile=" + (pd ? "PD" : "JSN")
+                                    + " bytes=" + receivedBytes + " records=" + records);
+                            }
+                        }
                     }
                 }
-            });
+            }, pd);
             long previous = -1;
             try {
                 while (active) {
