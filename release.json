@@ -14,7 +14,7 @@
       "bytes": 67050,
       "vehicle_install_observed": true,
       "installer_profile": "pd_kr",
-      "scope": "2026-10-29 installed/readback-matched; final UI checked with ignition off/AVN powered. Final subsequent ignition-on/cold-boot operation not verified. Earlier live observations and replay documented separately."
+      "scope": "2026-10-29 installed/readback-matched. Owner subsequently confirmed cold-boot app execution/settings retention, P/R/N/D1–D7 and individual TCS/ESC ON/OFF behavior (report received2026-11-03). Oil unavailable from AVN receive path; vehicle has no e-LSD. Earlier capture/replay evidence remains separately documented."
     },
     {
       "file": "apks/N-Dashboard-v6-API17.apk",

@@ -24,3 +24,12 @@ This file covers the PD adaptation against upstream/fork baseline `2be141b` (202
 - Kept inherited JSN installation/menu tools on JSN APKs so the higher PD version is not automatically selected for the upstream profile.
 - Updated public build/test compiler flags to Java8 (accepted by JDK17/21) while retaining D8 min-api17/DEX035; compile-only OEM declarations are passed as D8 classpath, never packaged.
 - No new vehicle installation, driving, cold-boot or ECU diagnostic operation was performed for this publication.
+
+## Owner-confirmed validation update — 2026-11-03
+
+- Confirmed app execution after cold boot and preservation of saved settings; this does not assert automatic full-screen launch.
+- Confirmed P/R/N and all forward gears D1–D7 on the vehicle.
+- Confirmed individual TCS/ESC ON/OFF behavior, including TCS-only disable with ESC remaining ON.
+- Clarified oil-temperature unavailability: no usable value found in the AVN receive path, so not implemented for this vehicle.
+- Clarified that the confirmed vehicle is not fitted with e-LSD; that feature is unavailable.
+- These corrections use the owner's report received on2026-11-03; no new agent-operated vehicle test, source or APK change was performed.

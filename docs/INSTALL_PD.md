@@ -35,4 +35,4 @@ Check the actual screen and values while parked. An accepted command does not pr
 
 The factory launcher may hide sideloaded apps. Use an existing reachable launcher or the unchanged optional My Apps companion. For optional companion behavior see the upstream [Quick entry guide](QUICK_ENTRY.md); its reboot/shortcut test limitations apply. **The inherited `scripts/install.py`/OEM menu profile targets JSN and does not install PD v11.** Neither this APK nor this PR creates a PD OEM menu entry. Do not apply the inherited JSN OEM menu procedure to PD.
 
-No PC is needed for the app's existing receive path after launch. Automatic reachability after a full reboot and final-v11 cold-boot telemetry have not been established. No new ADB or vehicle operation was performed to prepare this public PR.
+No PC is needed for the app's existing receive path after launch. The owner confirmed app execution and retained settings after a cold boot. Automatic full-screen launch at boot is not implied by that confirmation. No new ADB or vehicle operation was performed to prepare this public PR.

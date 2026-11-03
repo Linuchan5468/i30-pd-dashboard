@@ -33,7 +33,7 @@
     "rpm_target_lower_clamp_and_restart_persistence_checked": true,
     "both_f1_vehicle_name_sizes_visually_checked": true,
     "ignition_during_final_ui_check": "off; AVN powered",
-    "subsequent_ignition_on_or_cold_boot_verified": false
+    "subsequent_ignition_on_or_cold_boot_verified": true
   },
   "historical_mapping_scope": {
     "live_observations": "Earlier PD builds: RPM, speed, temperatures, pedal/throttle, brake/steering; owner reported response while parked",
@@ -41,9 +41,12 @@
       1,
       2,
       3,
-      4
+      4,
+      5,
+      6,
+      7
     ],
-    "gears5_to7": "synthetic host checks only",
+    "gears5_to7": "owner-confirmed on vehicle; also covered by synthetic host checks",
     "parked_tpms_psi": [
       32,
       32,
@@ -51,18 +54,43 @@
       31
     ],
     "other_tpms_units": "host conversions only",
-    "final_tcs_esc_correction": "recorded owner operations and receipt-time replay; final next-ignition UI check pending",
+    "final_tcs_esc_correction": "owner confirmed individual TCS/ESC ON/OFF on vehicle; earlier receipt-time replay retained",
     "abs": "warning lamp, not intervention",
     "torque_power_boost": "received-source research calculations, not independently calibrated output",
     "drive_capture": "808s complete frames retained before stop short of900s limit; partial session",
     "unavailable": [
-      "oil temperature",
+      "oil temperature: no usable AVN receive value",
       "valid battery SOC/voltage",
       "wheel speeds",
-      "e-LSD",
-      "actual ABS/TCS/ESC intervention"
-    ]
+      "e-LSD: not fitted to vehicle",
+      "actual ABS intervention"
+    ],
+    "gear_confirmation_source": "earlier captures1–4 plus owner confirmation of all D1–D7 received2026-11-03"
   },
   "privacy_scope": "No new raw vehicle captures, identifiers, settings/backups, OEM implementations, SDK binaries or private keys published. Numeric synthetic fixtures and aggregate observations retained.",
-  "limits_document": "docs/PD_VALIDATION.md"
+  "limits_document": "docs/PD_VALIDATION.md",
+  "owner_confirmation_update": {
+    "report_received": "2026-11-03",
+    "actual_later_test_dates": "not specified",
+    "source": "vehicle owner confirmation in project conversation",
+    "cold_boot_app_execution": true,
+    "cold_boot_saved_settings_retained": true,
+    "automatic_fullscreen_launch_at_boot": "not asserted",
+    "selector_and_gears_confirmed": [
+      "P",
+      "R",
+      "N",
+      "D1",
+      "D2",
+      "D3",
+      "D4",
+      "D5",
+      "D6",
+      "D7"
+    ],
+    "individual_tcs_esc_on_off_confirmed": true,
+    "oil_temperature": "not implemented for vehicle; no usable value found on AVN receive path",
+    "e_lsd": "not equipped; unavailable",
+    "new_agent_operated_vehicle_test": false
+  }
 }
