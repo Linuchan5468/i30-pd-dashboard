@@ -1,4 +1,13 @@
 {
+  "TCS 표시등": "TCS 표시등",
+  "TCS 사용 상태": "TCS 사용 상태",
+  "ESC 사용 상태": "ESC 사용 상태",
+  "ESC OFF 단계": "ESC OFF 단계",
+  "ABS 경고등": "ABS 경고등",
+  "TCS · ESC · ABS 상태": "TCS · ESC · ABS 상태",
+  "가속 페달": "가속 페달",
+  "가속 페달 %": "가속 페달 %",
+  "가속 페달 / PEDAL": "가속 페달",
   "내 앱 / My Apps": "내 앱",
   "실행 바로가기 / Quick entry": "실행 바로가기",
   "가장자리 버튼 + 알림 / Floating + notification": "가장자리 버튼 + 알림",

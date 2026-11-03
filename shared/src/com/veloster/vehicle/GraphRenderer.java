@@ -31,7 +31,7 @@ public final class GraphRenderer {
         p.setStyle(Paint.Style.FILL);p.setColor(0xff101920);c.drawRoundRect(new RectF(18,top,782,top+124),7,7,p);
         text(c,UiText.t(Telemetry.LABELS[signal]),30,top+20,15,BLUE);
         Telemetry.Sample current=model.sample(signal,now);
-        String value=current.valid?number(signal,Telemetry.displayValue(signal,current.value)):"—";
+        String value=current.valid?(signal==8?Telemetry.gearLabel((int)current.value):number(signal,Telemetry.displayValue(signal,current.value))):"—";
         text(c,value+" "+Telemetry.UNITS[signal],622,top+20,16,WHITE);
         Telemetry.Series series=model.history(signal,now,layout.window());
         float lo=Float.POSITIVE_INFINITY,hi=Float.NEGATIVE_INFINITY;

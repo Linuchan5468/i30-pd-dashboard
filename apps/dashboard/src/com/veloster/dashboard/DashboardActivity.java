@@ -17,6 +17,7 @@ public final class DashboardActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(new FrameLayout(this));
+        VehicleDash.profilePd(HscanDataClient.pdProfile());
         VehicleDash.attachStandalone(this);
         client=new VehicleDataClient(this);
     }

@@ -11,3 +11,7 @@
 Hyundai, Veloster N, Android, CarPlay 등 명칭은 기기·호환 대상 설명에 사용합니다. 해당 회사의 공식 앱이나 승인된 제품이라는 뜻이 아닙니다. `com.veloster.carplayhub`는 초기 실험에서 남은 패키지 이름이며, 무선 CarPlay 기능 제공을 뜻하지 않습니다.
 
 선택형 `menu-entry/`에는 직접 작성한 메뉴 연결 helper, 컴파일 선언, 원본 식별 해시만 제공합니다. 빌드 스크립트는 사용자가 제공한 정확한 OEM 원본을 로컬에서 재구성합니다. 생성 APK와 디컴파일 트리는 제조사 코드를 포함하므로 MIT 프로젝트 산출물로 재배포하지 않습니다. `prepare_menu_tools.py`가 받는 외부 JAR·공개 AOSP 테스트 키·인증서는 출처별 권리가 적용되며 저장소/릴리스에 번들하지 않습니다.
+
+## i30 PD Fork attribution — 2026-11-03
+
+This Fork preserves the original MIT license and contributor copyright notice from reikop/veloster-n-dashboard, baseline2be141b. PD adaptation work is distributed under the same license; it does not relicense upstream or external software. Research references include commaai/opendbc Hyundai CCAN definitions, openpilotkr/openpilot TPMS interpretation (commit3ff6dc6081c2a986c75292eefa0952641ab66b6f), and Hyundai PDe owner-manual descriptions; links and evidence limits are in docs/PD_VALIDATION.md. These references retain their own rights and are not bundled as source/DBC/manual copies. Original OEM implementation code, automotive framework binaries and raw vehicle data are excluded. The v11 APK contains project classes and inherited project resources, not OEM framework/stub implementations.

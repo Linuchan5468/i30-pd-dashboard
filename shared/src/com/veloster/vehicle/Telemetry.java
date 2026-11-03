@@ -5,14 +5,18 @@ public final class Telemetry {
     public static final int STEERING=13,AMBIENT=14,POWER=15,TORQUE=16,BOOST=17;
     public static final int TPMS_FL=18,TPMS_FR=19,TPMS_RL=20,TPMS_RR=21;
     public static final int TCS=22,ESC=23,ABS=24,BAT_SOC=25,BAT_VOLTAGE=26,STEERING_SPEED=27,ELSD=28;
-    public static final int INTAKE=29;
-    public static final String[] LABELS = {"엔진 회전수", "오일 온도", "냉각수 온도", "앞 왼쪽 휠", "앞 오른쪽 휠", "뒤 왼쪽 휠", "뒤 오른쪽 휠", "차량 속도", "EMS 기어", "스로틀", "브레이크 압력", "횡가속", "종가속", "조향각", "외기 온도", "출력 (계산)", "토크 (계산)", "부스트 (계산)", "앞 왼쪽 공기압", "앞 오른쪽 공기압", "뒤 왼쪽 공기압", "뒤 오른쪽 공기압", "TCS", "ESC", "ABS", "배터리 SOC", "배터리 전압", "조향 속도", "e-LSD 수치", "흡기 온도"};
-    public static final String[] UNITS = {"rpm", "°C", "°C", "km/h", "km/h", "km/h", "km/h", "km/h", "", "%", "bar", "G", "G", "°", "°C", "PS", "N·m", "bar", "psi", "psi", "psi", "psi", "", "", "", "%", "V", "°/s", "", "°C"};
+    public static final int INTAKE=29,ACCEL_PEDAL=30;
+    public static final int PD_TCS_ENABLED=31,PD_ESC_ENABLED=32,PD_ABS_WARNING=33;
+    public static final String[] LABELS = {"엔진 회전수", "오일 온도", "냉각수 온도", "앞 왼쪽 휠", "앞 오른쪽 휠", "뒤 왼쪽 휠", "뒤 오른쪽 휠", "차량 속도", "EMS 기어", "스로틀", "브레이크 압력", "횡가속", "종가속", "조향각", "외기 온도", "출력 (계산)", "토크 (계산)", "부스트 (계산)", "앞 왼쪽 공기압", "앞 오른쪽 공기압", "뒤 왼쪽 공기압", "뒤 오른쪽 공기압", "TCS", "ESC", "ABS", "배터리 SOC", "배터리 전압", "조향 속도", "e-LSD 수치", "흡기 온도", "가속 페달", "TCS 사용 상태", "ESC 사용 상태", "ABS 경고등"};
+    public static final String[] UNITS = {"rpm", "°C", "°C", "km/h", "km/h", "km/h", "km/h", "km/h", "", "%", "bar", "G", "G", "°", "°C", "PS", "N·m", "bar", "psi", "psi", "psi", "psi", "", "", "", "%", "V", "°/s", "", "°C", "%", "", "", ""};
     public static final long STALE_MS = 60000; // UI freshness threshold, not an OEM timeout.
     public static final long HISTORY_MS=300000,HISTORY_STEP_MS=250;
     private final History[] history=new History[LABELS.length];
     /** Display orientation follows the driver's reported left/right convention. Raw SAS stays unchanged. */
-    public static float displayValue(int signal,float raw){return signal==STEERING?(raw==0?0:-raw):raw;}
+    public static float displayValue(int signal,float raw){
+        if(signal==8)return raw>=101&&raw<=107?raw-100:raw<0?Float.NaN:raw;
+        return signal==STEERING?(raw==0?0:-raw):raw;
+    }
     public static final class Series {
         public final long[] times;
         public final float[] values;
@@ -54,6 +58,12 @@ public final class Telemetry {
         return history[signal]==null?new Series(0):history[signal].snapshot(now,window);
     }
     private int speedUnit=-1, rearView, rawSpeed;
+    private boolean pd;
+    public synchronized boolean pdProfile(){return pd;}
+    /** UI device profile only; does not create or refresh any received sample. */
+    public synchronized void pdProfile(boolean value){pd=value;}
+    private final PdPowertrain pdPowertrain=new PdPowertrain();
+    private final PdGearState pdGear=new PdGearState();
     private final long[] counts=new long[LABELS.length];
     private final float[] values = new float[LABELS.length];
     private final long[] times = new long[LABELS.length];
@@ -81,10 +91,11 @@ public final class Telemetry {
         changed[i] = ok && valid[i] && seen[i] && now-times[i] <= STALE_MS && values[i] != v;
         counts[i]++; values[i]=v; valid[i]=ok; seen[i]=true; times[i]=now;
         if(history[i]==null)history[i]=new History();
-        history[i].add(v,ok,now);
+        history[i].add(v,ok&&!Float.isNaN(displayValue(i,v)),now);
     }
     public synchronized void clear() {
         speedUnit=-1; rearView=0; rawSpeed=0;
+        pdPowertrain.clear();pdGear.clear();
         epoch++;ptValid=false;gfValid=false;stdSeen=false;lastComputedPt=-1;lastComputedGf=-1;
         calculation.remove();
         observedPreviousRpm=-1;observedTorqueValid=false;
@@ -99,7 +110,12 @@ public final class Telemetry {
         for(int i=0;i<result.length;i++)result[i]=sample(i,now);
         return result;
     }
-    public static String gearLabel(int raw) { return raw>=1&&raw<=6?String.valueOf(raw):"—"; }
+    public static String gearLabel(int raw) {
+        if(raw>=101&&raw<=107)return "D"+(raw-100);
+        if(raw==-1)return "P";if(raw==-2)return "R";if(raw==-3)return "N";
+        if(raw==-4)return "D";if(raw==-5)return "M";
+        return raw>=1&&raw<=6?String.valueOf(raw):"—";
+    }
     public synchronized void speed(int raw,long now) {
         rawSpeed=raw;
         put(7,speedUnit==1?raw*1.609344f:raw,speedUnit>=0 && raw>=0 && raw<511,now);
@@ -120,8 +136,12 @@ public final class Telemetry {
     }
     public synchronized String diagnostics(long now) {
         StringBuilder s=new StringBuilder("unit=").append(speedUnit);
-        for(int i=0;i<LABELS.length;i++)s.append(" ").append(i).append(":").append(counts[i])
-            .append("/").append(seen[i]?now-times[i]:-1).append("ms/").append(sample(i,now).valid?"valid":"unknown");
+        for(int i=0;i<LABELS.length;i++){
+            boolean ok=sample(i,now).valid;
+            s.append(" ").append(i).append(":").append(counts[i])
+                .append("/").append(seen[i]?now-times[i]:-1).append("ms/").append(ok?"valid":"unknown");
+            if(ok)s.append("=").append(values[i]);
+        }
         return s.toString();
     }
     public synchronized void rearView(int view) {
@@ -146,6 +166,89 @@ public final class Telemetry {
             int angle=((b[20]&255)<<8)|(b[21]&255);
             put(STEERING,(short)angle*0.1f,true,now);
         }
+    }
+    /** PD mappings verified against Can2BPDMessage and Can2BCsm in the OEM firmware. */
+    public synchronized void hscanPd(int cid,int function,byte[] b,long now){
+        if(cid!=0xc7||b==null)return;
+        if(function==8&&b.length==8){
+            // PD Can2BPDMessage EMS11 (0x316); OEM parser includes a leading
+            // function byte, so its indices 3/4 are payload offsets 2/3 here.
+            int raw=(b[2]&255)|((b[3]&255)<<8);
+            put(0,raw*0.25f,raw!=65535,now);
+        }else if(function==2&&b.length==4){
+            // CLU11 (0x4f1): unsigned 9-bit Vanz in half-unit steps.
+            // Its unit bit accompanies every receipt; no NMode unit event is needed.
+            int raw=(b[1]&255)|((b[2]&1)<<8);
+            speedUnit=(b[2]>>1)&1;
+            put(7,raw*0.5f*(speedUnit==1?1.609344f:1f),raw!=511,now);
+        }else if(function==9&&b.length==8){
+            int coolant=b[1]&255,pedal=b[6]&255,tps=b[5]&255;
+            put(2,coolant*0.75f-48,coolant<255,now);
+            put(ACCEL_PEDAL,pedal*0.3906f,pedal<255,now);
+            // EMS12 TPS definition corroborated by upstream Hyundai CCAN DBC.
+            float throttle=tps*0.4694836f-15.0234742f;
+            put(9,Math.max(0,Math.min(100,throttle)),tps>=32&&tps<=245,now);
+        }else if(function==0x0b&&b.length==8){
+            // PD table maps EMS15 (0x547); upstream DBC defines IntAirTemp at bit16.
+            int raw=b[2]&255;put(INTAKE,raw*0.75f-48,raw<255,now);
+        }else if(function==0x0d&&b.length==8){
+            // Raw0 is constant in the retained engine-on captures; sensor support
+            // is unconfirmed. Withhold that value rather than assert measured -40 C.
+            int raw=b[4]&255;put(1,raw*0.75f-40,raw>0&&raw<255,now);
+        }else if(function==0x14&&b.length==8){
+            int raw=b[3]&255;put(AMBIENT,raw*0.5f-40,raw<255,now);
+        }else if(function==0&&b.length==8){
+            int soc=b[2]&255,voltage=(b[3]&255)|((b[4]&63)<<8);
+            boolean sensorOk=(b[6]&0x80)==0&&(b[7]&0x80)==0;
+            put(BAT_SOC,soc,sensorOk&&soc<=100,now);
+            put(BAT_VOLTAGE,voltage*0.001f+6,sensorOk&&voltage<=12000,now);
+        }else if(function==0x19&&b.length==5){
+            int angle=(short)((b[0]&255)|((b[1]&255)<<8)),rate=b[2]&255;
+            // Accept the state observed in retained normal samples only; the
+            // OEM parser does not enumerate SAS status. Bounds are app policy.
+            boolean stateOk=(b[3]&255)==7;
+            put(STEERING,angle*0.1f,stateOk&&Math.abs(angle)<=10800,now);
+            put(STEERING_SPEED,rate*4,stateOk&&rate<255,now);
+        }else if(function==0x13&&b.length==8){
+            int pressure=((b[3]&255)>>2)|((b[4]&63)<<6);
+            // OEM confirms pressure layout; upstream DBC corroborates bar and
+            // defines ESP12 accelerations/status bits. Only observed zero flags
+            // are accepted, conservatively, until their enums are verified.
+            put(10,pressure*0.1f,(b[4]&0xc0)==0,now);
+            int lat=(b[0]&255)|((b[1]&7)<<8);
+            int longitudinal=((b[1]&255)>>5)|((b[2]&255)<<3);
+            put(11,(lat*0.01f-10.23f)/9.80665f,(b[1]&0x18)==0&&lat<2047,now);
+            put(12,(longitudinal*0.01f-10.23f)/9.80665f,(b[3]&3)==0&&longitudinal<2047,now);
+        }else if(function==0x1c&&b.length==4){
+            int tcsOff=(b[0]>>1)&3,escOff=b[1]&3;
+            boolean allFF=true;for(byte v:b)if(v!=(byte)255)allFF=false;
+            put(PD_TCS_ENABLED,tcsOff==0?1:0,!allFF&&tcsOff<=1,now);
+            // Step1 disables traction only; stability control remains enabled.
+            put(PD_ESC_ENABLED,escOff<2?1:0,!allFF&&escOff<=2,now);
+            put(PD_ABS_WARNING,b[0]&1,!allFF,now);
+        }else if(function==0x20&&b.length==6){
+            // PD TPMS11 CAN0x593, corroborated by original Hyundai TPMS decoding.
+            // Normalize PSI / encoded5kPa / encoded0.1bar to the panel's PSI unit.
+            int status=b[1]&7,unit=(b[1]>>3)&3;
+            float factor=unit==1?0.7251887f:unit==2?1.4503774f:1;
+            for(int i=0;i<4;i++){
+                int raw=b[2+i]&255;
+                float psi=raw*factor;
+                put(TPMS_FL+i,psi,status==1&&unit<=2&&raw<255&&psi<=100,now);
+            }
+        }else if((function==0x1d||function==0x1e)&&b.length==8){
+            PdGearState.Result gear=pdGear.receive(function,b,now);
+            if(gear.updated)put(8,gear.value,gear.valid,gear.time);
+        }else if(function==0x0a&&b.length==8){
+            // Atmospheric-pressure input is consumed by the PD calculation model.
+        }else return;
+        PdPowertrain.Result calculated=pdPowertrain.receive(function,b,now);
+        if(calculated.torqueUpdated){
+            put(TORQUE,calculated.torqueNm,calculated.torqueValid,calculated.torqueAt);
+            put(POWER,calculated.powerPs,calculated.torqueValid,calculated.torqueAt);
+        }
+        if(calculated.boostUpdated)put(BOOST,calculated.boostBar,calculated.boostValid,calculated.boostAt);
+        pd=true;
     }
     /** Only new IL frames from the verified JSN HSCAN bridge. No cached getter polling. */
     public synchronized void hscanJsn(int cid,int funcLow,byte[] b,long now){

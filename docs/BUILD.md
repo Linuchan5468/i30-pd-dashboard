@@ -1,3 +1,5 @@
+> PD Fork: 현재 계기판 소스는 v11 / 2.0-pdkr, Hub는 수정 없는 upstream v10입니다. 아래 일반 빌더는 서명 전 APK를 생성하며, 설치 검증된 v11은 공개 v6의 프로젝트 리소스를 유지하고 자체 소스를 JDK21/Java8→D8로 다시 컴파일한 파일입니다. 원본 설치·메뉴 도구는 JSN 전용입니다. [PD 검증](PD_VALIDATION.md)을 우선하세요.
+
 # 공개 소스 빌드와 테스트
 
 ## 설치 파일과 빌드 결과 구분
@@ -8,11 +10,11 @@
 
 ## 준비물
 
-- Python 3.9 이상과 JDK 17 (`java`, 같은 디렉터리의 `javac`).
+- Python 3.9 이상과 JDK 17 또는 21 (`java`, 같은 디렉터리의 `javac`).
 - 외부 Android SDK `android.jar` API 16 또는 17. 공개 준비 검증은 기존 API 16 JAR로 컴파일하고 min/target SDK는 17로 지정했습니다.
 - AAPT2 실행 파일과 D8가 포함된 R8 JAR. 도구는 사용자 설치 경로를 인자로 전달하며 이 폴더에 배포하지 않습니다.
 
-소스는 Java 7 언어/클래스 수준으로 컴파일하고 D8 `--min-api 17`을 사용합니다. 제조사 API 선언은 별도 클래스 디렉터리에 컴파일해 javac의 classpath에만 넣고, 앱 DEX에 패키징하지 않습니다. 실제 실행에는 차량의 OEM `automotive` 라이브러리가 필요합니다.
+소스는 Java 8 언어/클래스 수준으로 컴파일하고 D8 `--min-api 17`을 사용합니다. 제조사 API 선언은 별도 클래스 디렉터리에 컴파일해 javac의 classpath에만 넣고, 앱 DEX에 패키징하지 않습니다. 실제 실행에는 차량의 OEM `automotive` 라이브러리가 필요합니다.
 
 ## 호스트 테스트
 
@@ -58,4 +60,6 @@ python3 scripts/build.py hub \
 
 [단일 설치 명령](INSTALL.md)은 Python 표준 라이브러리와 ADB만 사용합니다. 빌드 도구나 키가 필요하지 않습니다. [선택형 OEM 메뉴 재구성](MENU_ENTRY_ko.md)에만 별도 JDK·Androguard·smali·개인 원본이 필요합니다. 관련 소스는 `menu-entry/`와 `scripts/build_menu_entry.py`이며, 외부 키를 받아 해당 로컬 메뉴 APK를 서명하는 경로입니다. OEM 코드가 포함된 생성물을 공개하지 않습니다.
 
-다국어 문자열은 `translations/en.json`, `ko.json`을 수정하고 `python3 scripts/generate_translations.py`로 Java 카탈로그를 갱신합니다. 빌더는 카탈로그 일치 여부를 검사하고 `res/values`, `res/values-ko`의 앱 이름 리소스도 컴파일합니다. 현재 소스는 계기판 v6·내 앱 v10에 대응합니다.
+다국어 문자열은 `translations/en.json`, `ko.json`을 수정하고 `python3 scripts/generate_translations.py`로 Java 카탈로그를 갱신합니다. 빌더는 카탈로그 일치 여부를 검사하고 `res/values`, `res/values-ko`의 앱 이름 리소스도 컴파일합니다. 현재 Fork 소스는 계기판 v11·내 앱 v10에 대응합니다.
+
+공개 준비에서 v11 전체 소스를 재컴파일한 DEX와 기존 프로젝트 리소스 기반 페이로드가 설치본과 바이트 일치했습니다. [빌드 출처](PD_BUILD_PROVENANCE.json). 일반 AAPT2 리소스 재생성 경로는 이번 공개 준비에서 다시 실행하지 않았습니다.
