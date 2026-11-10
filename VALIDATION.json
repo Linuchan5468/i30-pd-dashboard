@@ -11,19 +11,6 @@
     "sdk": 17,
     "firmware": "PD.KOR.SOP.V141.260114.STD_H"
   },
-  "current_publication_checks": {
-    "java_test_programs_passed": 15,
-    "python_tests_passed": 44,
-    "python_tests_skipped": 0,
-    "quick_entry_stub_scenarios": 16,
-    "translation_catalog_matches": true,
-    "release_apk_integrity_count": 7,
-    "v1_crypto_verified_count": 7,
-    "foreign_dex_class_definitions": 0,
-    "v11_rebuilt_dex_matches_installed_artifact": true,
-    "v11_rebuilt_manifest_and_resources_match": true,
-    "new_vehicle_or_emulator_test": false
-  },
   "historical_v11": {
     "version_name": "2.0-pdkr",
     "version_code": 11,
@@ -92,5 +79,31 @@
     "oil_temperature": "not implemented for vehicle; no usable value found on AVN receive path",
     "e_lsd": "not equipped; unavailable",
     "new_agent_operated_vehicle_test": false
+  },
+  "publication_20261103_checks": {
+    "java_test_programs_passed": 15,
+    "python_tests_passed": 44,
+    "python_tests_skipped": 0,
+    "quick_entry_stub_scenarios": 16,
+    "translation_catalog_matches": true,
+    "release_apk_integrity_count": 7,
+    "v1_crypto_verified_count": 7,
+    "foreign_dex_class_definitions": 0,
+    "v11_rebuilt_dex_matches_installed_artifact": true,
+    "v11_rebuilt_manifest_and_resources_match": true,
+    "new_vehicle_or_emulator_test": false
+  },
+  "versioning_update_date": "2026-11-10",
+  "current_release": {
+    "pd_version": "1.0.0",
+    "version_name": "1.0.0-pd",
+    "version_code": 12,
+    "apk": "apks/i30-PD-Dashboard-v1.0.0-API17.apk",
+    "apk_sha256": "6a0e936f7d0e79f498cdd00daffcab180ed573d8f64d29432eff1045cd907e99",
+    "checks": "Offline package/version/API17, V1 cryptographic signature, signer continuity, alignment, identical DEX/resources and manifest-only version changes",
+    "vehicle_install_observed": false,
+    "vehicle_update_or_settings_retention_tested": false,
+    "emulator_test_performed": false,
+    "provenance": "docs/PD_1.0.0_BUILD_PROVENANCE.json"
   }
 }

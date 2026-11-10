@@ -2,6 +2,8 @@
 
 Target: one Korean i30 PD N Line DCT7 / Gen5 API17 / `pd_kr` / `eng.vmadmin.20260114.084130`. No year, engine, regional or firmware-wide compatibility is inferred. Initial evidence dates are2026-10-29; public preparation is2026-11-03. Updated vehicle confirmations were supplied by the owner on2026-11-03; the dates of those later tests were not specified.
 
+Independent PD v1.0.0 (`1.0.0-pd`, versionCode12), built on2026-11-10, has offline signature/integrity and payload-comparison checks only. Its DEX and compiled resources match historical v11, with only the manifest version attributes changed. No new vehicle or emulator installation, update/settings-retention or cold-boot check was performed. The observations below remain attributed to the historical builds. See [current build provenance](PD_1.0.0_BUILD_PROVENANCE.json).
+
 | Item | Evidence and limits |
 |---|---|
 | RPM/speed | Earlier PD versions displayed live RPM changes and parked speed0; recorded driving speed0–74.5km/h. This is not an accuracy calibration across the range. |

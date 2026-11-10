@@ -1,6 +1,14 @@
 # Changelog
 
-This file covers the PD adaptation against upstream/fork baseline `2be141b` (2026-10-26 UI release). The original seven commits are ancestors of this branch. Upstream's later optional Performance dashboard commit is not included in this PD change. Dates below describe local development/vehicle work, not GitHub release dates.
+This file covers the PD adaptation against upstream/fork baseline `2be141b` (2026-10-26 UI release). The original seven commits are ancestors of this branch. Upstream's later optional Performance dashboard commit is not included in this PD change. Dates describe development, validation or repository work as stated, not GitHub Release publication dates. PD now uses an independent MAJOR.MINOR.PATCH series; historical v7–v11 labels remain as evidence identifiers.
+
+## i30 PD 1.0.0 — 2026-11-10
+
+- Started independent PD public versioning at 1.0.0, Android `versionName=1.0.0-pd`; retained package/signing identity and raised internal `versionCode` to12 for upgrades from code11.
+- Published `i30-PD-Dashboard-v1.0.0-API17.apk` and updated the current download/install instructions, release metadata and checksums. Original JSN/My Apps versioning is unchanged.
+- Recompiled the same application sources. DEX and compiled resources match the installed historical v11 byte-for-byte; binary manifest changes are limited to the two version attributes. V1 signature, signer continuity, API17/DEX035 and alignment checks passed offline.
+- No telemetry, UI, permissions or settings logic changes. No new vehicle/emulator installation or cold-boot test; existing vehicle observations remain attributed to the historical builds. Preserved the historical v11 APK and build/validation records.
+- Checked that all PD APKs remain excluded from the inherited JSN installer.
 
 ## 2.0-pdkr / versionCode 11 — 2026-10-29
 
