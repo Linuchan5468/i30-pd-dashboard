@@ -1,6 +1,6 @@
 # i30 PD installation and launch / 설치·실행
 
-Only the exact target in [README](../README_ko.md) was checked. Perform installation and screen interaction while parked. Use an already working ADB connection. No root is required merely to install this separate app; OEM signature/permission policies still apply.
+Historical vehicle observations apply only to the exact target in [README](../README_ko.md). The current v1.1.0 development APK has synthetic-input emulator tests, with no new vehicle installation/cold-boot test. Perform vehicle installation and screen interaction while parked. Use an already working ADB connection. No root is required merely to install this separate app; OEM signature/permission policies still apply.
 
 1. Check `adb devices -l` and replace `SERIAL` below with your device. Confirm product/build before installing:
 
@@ -24,14 +24,16 @@ adb -s SERIAL shell dumpsys package com.veloster.dashboard
 adb -s SERIAL shell pm path com.veloster.dashboard
 ```
 
-4. Install the current PD v1.0.0 APK and request launch. This version-metadata rebuild passed offline checks; its new APK has not been installed on the vehicle. Historical vehicle checks refer to v11 and earlier builds:
+4. Install the current PD v1.1.0 development APK and request launch. No new vehicle installation test has been performed; historical vehicle checks refer to v11 and earlier builds. The published v1.0.0 Release remains separately available:
 
 ```sh
-adb -s SERIAL install -r apks/i30-PD-Dashboard-v1.0.0-API17.apk
+adb -s SERIAL install -r apks/i30-PD-Dashboard-v1.1.0-API17.apk
 adb -s SERIAL shell am start -n com.veloster.dashboard/.DashboardActivity
 ```
 
-Check the actual screen and values while parked. An accepted command does not prove useful telemetry. Signature mismatch/unsupported target requires investigation; no permission-policy bypass is provided. The app retains package name `com.veloster.dashboard` and the same signing certificate. Its internal versionCode12 is higher than historical v11, so the new public label 1.0.0 is not an Android downgrade. Update acceptance and saved settings still need checking on the vehicle. The historical installed APK remains available as provenance; installing a lower-code APK over this update may be rejected.
+Check the actual screen and values while parked. An accepted command does not prove useful telemetry. Signature mismatch/unsupported target requires investigation; no permission-policy bypass is provided. The app retains package name `com.veloster.dashboard` and the same signing certificate. Its internal versionCode13 is higher than v1.0.0/code12 and historical v11. Update acceptance and saved settings still need checking on the vehicle. The historical installed APK remains available as provenance; installing a lower-code APK over this update may be rejected.
+
+For torque units, open **SET → Torque unit** (Korean: **설정 → 토크 단위**), choose N·m or kgf·m, then save. Cancel leaves the previous selection in place. This is an app display preference, not a vehicle-unit setting. Language selection is available in the same SET menu.
 
 The factory launcher may hide sideloaded apps. Use an existing reachable launcher or the unchanged optional My Apps v10 companion. To install and request opening that companion while parked:
 

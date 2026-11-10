@@ -227,5 +227,11 @@
   "게이지를 길게 눌러 항목 · 모양 · 위치 편집": "Hold a gauge to edit its signal, style or position",
   "3 × 2 보기": "3 x 2 grid",
   "4 × 3 보기": "4 x 3 grid",
-  "언어 설정을 저장하지 못했습니다.": "Could not save the language setting."
+  "언어 설정을 저장하지 못했습니다.": "Could not save the language setting.",
+  "설정": "SET",
+  "표시 설정": "Display settings",
+  "토크 단위": "Torque unit",
+  "뉴턴미터 (N·m)": "Newton metres (N·m)",
+  "킬로그램힘미터 (kgf·m)": "Kilogram-force metres (kgf·m)",
+  "표시 설정을 저장하지 못했습니다.": "Could not save the display setting."
 }

@@ -28,6 +28,7 @@ public final class PitRenderer {
     private final GraphRenderer graphRenderer=new GraphRenderer();
     private GraphLayout graphLayout;
     private GaugeLayout gaugeLayout;
+    private TorqueUnit torqueUnit=TorqueUnit.NEWTON_METRE;
     private OverviewLayout overviewLayout=new OverviewLayout();
     private final java.text.SimpleDateFormat clockFormat=new java.text.SimpleDateFormat("HH:mm",Locale.US);
     private long clockMinute=Long.MIN_VALUE;
@@ -41,11 +42,12 @@ public final class PitRenderer {
     public void setGaugeLayout(GaugeLayout value){gaugeLayout=value;}
     public void setGraphLayout(GraphLayout value){graphLayout=value;}
     public void setOverviewLayout(OverviewLayout value){if(value!=null)overviewLayout=value;}
+    public void setTorqueUnit(TorqueUnit value){torqueUnit=value==null?TorqueUnit.NEWTON_METRE:value;gaugeRenderer.setTorqueUnit(torqueUnit);graphRenderer.setTorqueUnit(torqueUnit);}
     private static final String[] PREFIX={"엔진 RPM","오일 온도","냉각수 온도","앞 왼쪽 휠","앞 오른쪽 휠","뒤 왼쪽 휠","뒤 오른쪽 휠","속도 km/h","현재 기어","스로틀 %","브레이크 압력 bar","횡가속","종가속","조향각","외기 온도","출력 (계산)","토크 (계산)","부스트 (계산)","앞 왼쪽 공기압","앞 오른쪽 공기압","뒤 왼쪽 공기압","뒤 오른쪽 공기압","TCS","ESC","ABS","배터리 SOC","배터리 전압","조향 속도","e-LSD 수치","흡기 온도","가속 페달 %","TCS 사용 상태","ESC 사용 상태","ABS 경고등"};
     private int index(String prefix){for(int i=0;i<PREFIX.length;i++)if(PREFIX[i].equals(prefix))return i;return -1;}
     private String value(String prefix){int i=index(prefix);if(i<0||i>=samples.length||!samples[i].valid)return "—";
         if(i==8)return Telemetry.gearLabel((int)samples[i].value);
-        return String.format(Locale.US,i==0||i==7||(i>=Telemetry.TPMS_FL&&i<=Telemetry.BAT_SOC)||i==Telemetry.STEERING_SPEED?"%.0f":i==11||i==12?"%+.2f":i==13?"%+.1f":i==17||i==Telemetry.BAT_VOLTAGE?"%.2f":"%.1f",Telemetry.displayValue(i,samples[i].value));}
+        return String.format(Locale.US,i==0||i==7||(i>=Telemetry.TPMS_FL&&i<=Telemetry.BAT_SOC)||i==Telemetry.STEERING_SPEED?"%.0f":i==11||i==12?"%+.2f":i==13?"%+.1f":i==17||i==Telemetry.BAT_VOLTAGE?"%.2f":"%.1f",torqueUnit.displayValue(i,samples[i].value));}
     private float numeric(String prefix){int i=index(prefix);return i>=0&&i<samples.length&&samples[i].valid?Telemetry.displayValue(i,samples[i].value):0;}
     private boolean changed(String prefix){int i=index(prefix);return i>=0&&i<samples.length&&samples[i].changed;}
     public void draw(Canvas c,int width,int height,boolean cluster,Telemetry model,long now){
@@ -69,7 +71,7 @@ public final class PitRenderer {
         button(c,"F1",250,8,72,38,cluster&&gaugeLayout==null&&graphLayout==null,BLUE);
         button(c,UiText.t("게이지"),328,8,84,38,gaugeLayout!=null,BLUE);
         button(c,UiText.t("그래프"),418,8,110,38,graphLayout!=null,BLUE);
-        button(c,UiText.language().toUpperCase(Locale.US),534,8,48,38,false,BLUE);
+        button(c,UiText.t("설정"),534,8,48,38,false,BLUE);
         centered(c,clock(),620,33,22,WHITE,true);
         button(c,UiText.t("돌아가기"),666,8,116,38,false,BLUE);
         if(graphLayout!=null)graphRenderer.draw(c,model,now,graphLayout);
@@ -295,8 +297,9 @@ public final class PitRenderer {
         fitted(c,title,x+10,y+(head?18:22),head?11:13,w-20,MUTED);
         String number=ok?value(PREFIX[i]):"—";
         float lo=GaugeRenderer.min(i,Telemetry.UNITS[i]),hi=GaugeRenderer.max(i,Telemetry.UNITS[i]);
+        if(i==Telemetry.TORQUE){lo=torqueUnit.fromNewtonMetres(lo);hi=torqueUnit.fromNewtonMetres(hi);}
         // P/R/N labels have no numeric gauge position; encoded D1..D7 use display values.
-        float displayed=Telemetry.displayValue(i,samples[i].value);
+        float displayed=torqueUnit.displayValue(i,samples[i].value);
         boolean position=ok&&!Float.isNaN(displayed)&&!Float.isInfinite(displayed)
             &&(i!=8||(displayed>=1&&displayed<=7));
         float f=position?Math.max(0,Math.min(1,(displayed-lo)/(hi-lo))):0;
@@ -316,6 +319,6 @@ public final class PitRenderer {
             if(position){double angle=Math.toRadians(150+240*f);stroke(c,cx,cy,cx+(float)Math.cos(angle)*(radius-6),cy+(float)Math.sin(angle)*(radius-6),WHITE,1.5f);paint.setColor(BLUE);c.drawCircle(cx,cy,2,paint);}
             fitted(c,number,x+58,y+(head?54:66),head?26:28,w-68,color);
         }
-        if(!head)text(c,Telemetry.UNITS[i],x+10,y+85,11,MUTED,false);
+        if(!head)text(c,torqueUnit.unit(i),x+10,y+85,11,MUTED,false);
     }
 }

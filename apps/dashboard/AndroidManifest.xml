@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.veloster.dashboard" android:versionCode="12" android:versionName="1.0.0-pd">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.veloster.dashboard" android:versionCode="13" android:versionName="1.1.0-pd">
     <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="17" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application android:label="@string/app_name" android:allowBackup="false" android:debuggable="true" android:theme="@android:style/Theme.Holo.NoActionBar">

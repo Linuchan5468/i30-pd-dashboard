@@ -92,6 +92,7 @@ public final class UiText {
         EN.put("내비게이션 재시작 요청을 전달했습니다.","Head-unit restart requested.");
         EN.put("냉각수 온도","Coolant temperature");
         EN.put("눌러서 N 계기판과 앱 목록 열기","Tap to open N Dashboard and your app list");
+        EN.put("뉴턴미터 (N·m)","Newton metres (N·m)");
         EN.put("다른 칸과 위치 바꾸기","Swap with another slot");
         EN.put("다음","Next");
         EN.put("닫기","Close");
@@ -135,6 +136,7 @@ public final class UiText {
         EN.put("상태 확인 실패: ","Status check failed: ");
         EN.put("새 기기","New device");
         EN.put("설명 / Help","Help");
+        EN.put("설정","SET");
         EN.put("설정 복원 확인. 백업 표시 삭제 실패로 다음 실행 때 재확인 필요.","Settings restoration verified, but the backup marker could not be cleared. Check again next time.");
         EN.put("설정 상태 확인 불가","Setting unavailable");
         EN.put("설정: ","Setting: ");
@@ -218,8 +220,10 @@ public final class UiText {
         EN.put("취소 / Cancel","Cancel");
         EN.put("켜기","Enable");
         EN.put("켜면 재부팅 뒤에도 작은 바로가기만 복원합니다. 앱 화면은 자동으로 열지 않습니다. 가장자리 버튼은 끌어서 옮길 수 있습니다.\n\n시스템이 다른 앱 위 표시를 허용하지 않으면 알림만 유지합니다. 순정 화면에서 알림을 열 수 없는 경우에는 별도 메뉴 진입점이 필요합니다. 강제 종료하면 직접 앱을 다시 열 때까지 자동 복원이 중지될 수 있습니다.\n\nWhen enabled, reboot restores only the shortcut. Drag the edge button to move it. If overlays are denied, a notification remains. If the factory UI hides notifications too, use a separate menu entry. Force-stop may block restoration until My Apps is opened again.","When enabled, reboot restores only the shortcut, not the full app screen. Drag the edge button to move it.\n\nIf overlays are denied, the notification remains. If the factory UI also hides notifications, use another entry point. Force-stop may prevent restoration until My Apps is opened again.");
+        EN.put("킬로그램힘미터 (kgf·m)","Kilogram-force metres (kgf·m)");
         EN.put("타이어 공기압","Tire pressure");
         EN.put("토크 (계산)","Torque (calc.)");
+        EN.put("토크 단위","Torque unit");
         EN.put("페어링","Pair");
         EN.put("페어링 요청 실패: ","Pairing request failed: ");
         EN.put("페어링 요청이 거부되었습니다.","The pairing request was denied.");
@@ -228,6 +232,8 @@ public final class UiText {
         EN.put("페어링된 기기가 없습니다.","No paired devices.");
         EN.put("페어링됨","Paired");
         EN.put("페어링을 요청했습니다. PIN 확인 창이 나타나면 차량 화면에서 확인하세요.","Pairing requested. Confirm the PIN on the head-unit screen if prompted.");
+        EN.put("표시 설정","Display settings");
+        EN.put("표시 설정을 저장하지 못했습니다.","Could not save the display setting.");
         EN.put("표시 항목","Signal");
         EN.put("표시할 설치 앱이 없습니다. 앱 설치 뒤 다시 열거나 목록 편집에서 선택하세요.","No installed apps to show. Reopen after installing an app or select one in Edit app list.");
         EN.put("핫스팟 끄기 확인 실패. 백업을 보존했습니다. 다시 복구하세요.","Could not confirm hotspot shutdown. Backup retained; retry restoration.");
