@@ -1,6 +1,6 @@
 # i30 PD installation and launch / 설치·실행
 
-Historical vehicle observations apply only to the exact target in [README](../README_ko.md). The current v1.1.0 development APK has synthetic-input emulator tests, with no new vehicle installation/cold-boot test. Perform vehicle installation and screen interaction while parked. Use an already working ADB connection. No root is required merely to install this separate app; OEM signature/permission policies still apply.
+Historical vehicle observations apply only to the exact target in [README](../README_ko.md). The current v1.1.0 APK has synthetic-input emulator tests, with no new vehicle installation/cold-boot test. Perform vehicle installation and screen interaction while parked. Use an already working ADB connection. No root is required merely to install this separate app; OEM signature/permission policies still apply.
 
 1. Check `adb devices -l` and replace `SERIAL` below with your device. Confirm product/build before installing:
 
@@ -24,7 +24,7 @@ adb -s SERIAL shell dumpsys package com.veloster.dashboard
 adb -s SERIAL shell pm path com.veloster.dashboard
 ```
 
-4. Install the current PD v1.1.0 development APK and request launch. No new vehicle installation test has been performed; historical vehicle checks refer to v11 and earlier builds. The published v1.0.0 Release remains separately available:
+4. Install the current PD v1.1.0 APK and request launch. The same file is attached to the v1.1.0 GitHub Release. No new vehicle installation test has been performed; historical vehicle checks refer to v11 and earlier builds. The previous v1.0.0 Release remains available:
 
 ```sh
 adb -s SERIAL install -r apks/i30-PD-Dashboard-v1.1.0-API17.apk

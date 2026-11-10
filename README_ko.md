@@ -10,9 +10,9 @@
 
 ## 설치 파일
 
-현재 개발 APK는 [i30-PD-Dashboard-v1.1.0-API17.apk](apks/i30-PD-Dashboard-v1.1.0-API17.apk), **i30 PD v1.1.0** (`versionName=1.1.0-pd`, `versionCode=13`)입니다. 토크 N·m / kgf·m 선택·저장 기능을 추가했습니다. 기존 ARM32 QEMU/API17 에뮬레이터에서 설치본 해시를 대조하고 합성 입력으로 화면·저장·취소·프로세스 재실행을 확인했습니다. 기존 앱의 업데이트 경로를 위해 패키지명과 서명 인증서를 유지했습니다. 새 APK의 실차 설치·콜드 부팅 검증은 진행하지 않았습니다. [검증 상세](docs/PD_VALIDATION.md), [빌드 출처](docs/PD_1.1.0_BUILD_PROVENANCE.json).
+현재 릴리스 APK는 [i30-PD-Dashboard-v1.1.0-API17.apk](apks/i30-PD-Dashboard-v1.1.0-API17.apk), **i30 PD v1.1.0** (`versionName=1.1.0-pd`, `versionCode=13`)입니다. 토크 N·m / kgf·m 선택·저장 기능을 추가했습니다. 기존 ARM32 QEMU/API17 에뮬레이터에서 설치본 해시를 대조하고 합성 입력으로 화면·저장·취소·프로세스 재실행을 확인했습니다. 기존 앱의 업데이트 경로를 위해 패키지명과 서명 인증서를 유지했습니다. 새 APK의 실차 설치·콜드 부팅 검증은 진행하지 않았습니다. [검증 상세](docs/PD_VALIDATION.md), [빌드 출처](docs/PD_1.1.0_BUILD_PROVENANCE.json).
 
-GitHub에 게시된 최신 릴리스는 [v1.0.0](https://github.com/Linuchan5468/i30-pd-dashboard/releases/tag/v1.0.0)이며, 당시 [빌드 출처](docs/PD_1.0.0_BUILD_PROVENANCE.json)를 보존합니다. v1.1.0은 별도 개발 빌드입니다.
+[v1.1.0 GitHub 릴리스](https://github.com/Linuchan5468/i30-pd-dashboard/releases/tag/v1.1.0)에서 APK를 받을 수 있습니다. 이전 [v1.0.0 릴리스](https://github.com/Linuchan5468/i30-pd-dashboard/releases/tag/v1.0.0)와 당시 [빌드 출처](docs/PD_1.0.0_BUILD_PROVENANCE.json)도 보존합니다.
 
 마지막으로 실차 설치·재읽기 해시까지 확인한 파일은 [과거 PD v11 / 2.0-pdkr](apks/N-Dashboard-v11-PD-API17.apk)이며, 2026-10-29 설치본입니다. 최초 최종 UI 검사는 시동 종료 후 AVN 전원을 유지한 상태에서 수행했습니다. 이후 사용자가 콜드 부팅 후 앱 실행과 저장된 설정값 유지를 실차에서 확인했습니다. 이는 당시 버전의 실차 기록이며 v1.0.0·v1.1.0의 새 실차 설치 검증을 뜻하지 않습니다. [검증 상세](docs/PD_VALIDATION.md).
 

@@ -2,14 +2,14 @@
 
 This file covers the PD adaptation against upstream/fork baseline `2be141b` (2026-10-26 UI release). The original seven commits are ancestors of this branch. Upstream's later optional Performance dashboard commit is not included in this PD change. Dates describe development, validation or repository work as stated, not GitHub Release publication dates. PD now uses an independent MAJOR.MINOR.PATCH series; historical v7–v11 labels remain as evidence identifiers.
 
-## i30 PD 1.1.0 — development build, 2026-11-10
+## i30 PD 1.1.0 — 2026-11-10
 
 - Added persisted N·m / kgf·m torque display selection under SET → Torque unit (설정 → 토크 단위). Default remains N·m; save/cancel are explicit, and language selection remains available under SET.
 - Applied the selection to overview cards, gauge values/scales and graph values, existing history and axes. Converts using 1 kgf·m = 9.80665 N·m; values display to one decimal place. All-invalid graph history uses the selected unit for fallback axes.
 - Kept received samples/history/timestamps and torque/power calculations in N·m. Unit changes do not create samples, restore stale values or change other signal units.
 - Added host conversion and sample/history preservation checks. API17/V1-signed APK uses versionName1.1.0-pd and internal versionCode13, with the existing package and certificate.
 - Tested the exact installed APK in the existing ARM32 QEMU/API17 emulator using a separate synthetic-input fixture: overview/gauge35.7 kgf·m from350 N·m, graph values/history/axes in both units, save/cancel, zero/negative/missing data and process-restart preference retention. Stopped the fixture, cleared its samples and verified a normal relaunch with the saved unit. No shipping test hooks or lifecycle bypass were added.
-- No new vehicle installation, settings/cold-boot or telemetry accuracy validation. This development build does not replace the published v1.0.0 GitHub Release.
+- Published v1.1.0 with the same emulator-tested APK, unchanged hash and signing certificate. The v1.0.0 Release remains available. No new vehicle installation, settings/cold-boot or telemetry accuracy validation was performed for publication.
 
 ## i30 PD 1.0.0 — 2026-11-10
 
