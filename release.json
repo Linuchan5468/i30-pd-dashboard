@@ -91,7 +91,7 @@
       "scope": "Historical installed release; no universal compatibility claim."
     }
   ],
-  "release_tag": null,
+  "release_tag": "v1.0.0",
   "languages": [
     "ko",
     "en"
