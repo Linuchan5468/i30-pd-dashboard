@@ -1,6 +1,6 @@
 # PD 소스 빌드와 테스트
 
-이 문서는 i30 PD Fork의 v1.1.0 / 1.1.0-pd 개발 빌드와 선택형 My Apps v10 소스에 적용합니다. 설치·실행은 [PD 설치 안내](INSTALL_PD.md), 대상과 실차 확인 범위는 [PD 검증 기록](PD_VALIDATION.md)을 참고하세요.
+이 문서는 i30 PD Fork의 v1.1.0 / 1.1.0-pd 릴리스와 선택형 My Apps v10 소스에 적용합니다. 설치·실행은 [PD 설치 안내](INSTALL_PD.md), 대상과 실차 확인 범위는 [PD 검증 기록](PD_VALIDATION.md)을 참고하세요.
 
 ## 준비물
 
@@ -46,6 +46,6 @@ v1.1.0은 토크 표시 단위 기능을 추가해 앱 DEX가 변경됐습니다
 
 ## 배포 파일과 문서 갱신
 
-현재 PD 개발 설치 파일은 `apks/i30-PD-Dashboard-v1.1.0-API17.apk`이며, 게시된 GitHub Release v1.0.0은 별도로 유지합니다. PD 공개 버전은 1.0.0부터 독립 관리하고, Android 내부 `versionCode`는 기존 설치본보다 증가시킵니다. 과거 PD v11 및 이전 JSN APK는 이력·출처 확인용으로 남깁니다. 기존 JSN 설치·메뉴 스크립트의 프로필 제한은 유지합니다. 수정하지 않은 My Apps의 버전은 변경하지 않습니다.
+현재 PD 릴리스 설치 파일은 `apks/i30-PD-Dashboard-v1.1.0-API17.apk`이며 GitHub Release v1.1.0에도 같은 파일을 첨부합니다. 이전 v1.0.0 릴리스는 유지합니다. PD 공개 버전은 1.0.0부터 독립 관리하고, Android 내부 `versionCode`는 기존 설치본보다 증가시킵니다. 과거 PD v11 및 이전 JSN APK는 이력·출처 확인용으로 남깁니다. 기존 JSN 설치·메뉴 스크립트의 프로필 제한은 유지합니다. 수정하지 않은 My Apps의 버전은 변경하지 않습니다.
 
 새 파일을 배포하면 `release.json`, `SHA256SUMS`, `VALIDATION.json`, `SOURCE_SHA256SUMS`와 확인 범위를 함께 갱신합니다. 개인키·OEM 구현·펌웨어·원시 차량 캡처·식별자·개인 설정 및 백업은 추가하지 않습니다. 라이선스·저작권·외부 의존성 고지는 유지합니다.

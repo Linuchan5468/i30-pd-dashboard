@@ -15,7 +15,7 @@
       "bytes": 69180,
       "vehicle_install_observed": false,
       "installer_profile": "pd_kr",
-      "artifact_role": "pd_1.1.0_build",
+      "artifact_role": "current_pd_release",
       "scope": "Persistent N·m / kgf·m display selection across overview, gauges and graphs. Offline checks and existing QEMU/API17 synthetic-input UI/save/cancel/app-restart tests passed. No new vehicle installation, sensor accuracy or guest/vehicle cold-boot test.",
       "emulator_test_observed": true
     },
@@ -105,7 +105,7 @@
       "scope": "Historical installed release; no universal compatibility claim."
     }
   ],
-  "release_tag": null,
+  "release_tag": "v1.1.0",
   "languages": [
     "ko",
     "en"
