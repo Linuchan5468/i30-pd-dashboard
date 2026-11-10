@@ -12,6 +12,8 @@ import java.util.Locale;
 public final class GraphRenderer {
     private final Paint p=new Paint(3);
     private final Path path=new Path();
+    private TorqueUnit torqueUnit=TorqueUnit.NEWTON_METRE;
+    public void setTorqueUnit(TorqueUnit value){torqueUnit=value==null?TorqueUnit.NEWTON_METRE:value;}
     private static final int BLUE=0xffa4d9ef,WHITE=0xffe1edf2,MUTED=0xff8299a4,LINE=0xff293943;
     private void text(Canvas c,String s,float x,float y,float size,int color){p.setStyle(Paint.Style.FILL);p.setTypeface(Typeface.DEFAULT);p.setTextAlign(Paint.Align.LEFT);p.setTextSize(size);p.setColor(color);c.drawText(s,x,y,p);}
     private void line(Canvas c,float x,float y,float xx,float yy,int color){p.setStyle(Paint.Style.STROKE);p.setColor(color);p.setStrokeWidth(1);c.drawLine(x,y,xx,yy,p);p.setStyle(Paint.Style.FILL);}
@@ -31,13 +33,16 @@ public final class GraphRenderer {
         p.setStyle(Paint.Style.FILL);p.setColor(0xff101920);c.drawRoundRect(new RectF(18,top,782,top+124),7,7,p);
         text(c,UiText.t(Telemetry.LABELS[signal]),30,top+20,15,BLUE);
         Telemetry.Sample current=model.sample(signal,now);
-        String value=current.valid?(signal==8?Telemetry.gearLabel((int)current.value):number(signal,Telemetry.displayValue(signal,current.value))):"—";
-        text(c,value+" "+Telemetry.UNITS[signal],622,top+20,16,WHITE);
+        String value=current.valid?(signal==8?Telemetry.gearLabel((int)current.value):number(signal,torqueUnit.displayValue(signal,current.value))):"—";
+        text(c,value+" "+torqueUnit.unit(signal),622,top+20,16,WHITE);
         Telemetry.Series series=model.history(signal,now,layout.window());
         float lo=Float.POSITIVE_INFINITY,hi=Float.NEGATIVE_INFINITY;
-        for(int i=0;i<series.size();i++)if(series.valid[i]){float v=Telemetry.displayValue(signal,series.values[i]);lo=Math.min(lo,v);hi=Math.max(hi,v);}
-        if(lo==Float.POSITIVE_INFINITY){lo=GaugeRenderer.min(signal,Telemetry.UNITS[signal]);hi=GaugeRenderer.max(signal,Telemetry.UNITS[signal]);}
-        else{if(signal==Telemetry.STEERING||signal==11||signal==12){lo=Math.min(lo,0);hi=Math.max(hi,0);}float pad=Math.max(span(signal)/2,(hi-lo)*0.12f);lo-=pad;hi+=pad;}
+        for(int i=0;i<series.size();i++)if(series.valid[i]){float v=torqueUnit.displayValue(signal,series.values[i]);lo=Math.min(lo,v);hi=Math.max(hi,v);}
+        if(lo==Float.POSITIVE_INFINITY){
+            lo=GaugeRenderer.min(signal,Telemetry.UNITS[signal]);hi=GaugeRenderer.max(signal,Telemetry.UNITS[signal]);
+            if(signal==Telemetry.TORQUE){lo=torqueUnit.fromNewtonMetres(lo);hi=torqueUnit.fromNewtonMetres(hi);}
+        }
+        else{if(signal==Telemetry.STEERING||signal==11||signal==12){lo=Math.min(lo,0);hi=Math.max(hi,0);}float minimumSpan=signal==Telemetry.TORQUE?torqueUnit.fromNewtonMetres(span(signal)):span(signal);float pad=Math.max(minimumSpan/2,(hi-lo)*0.12f);lo-=pad;hi+=pad;}
         final float left=82,right=766,plotTop=top+30,bottom=top+103;
         for(int row=0;row<=2;row++){float y=plotTop+(bottom-plotTop)*row/2;line(c,left,y,right,y,LINE);text(c,number(signal,hi-(hi-lo)*row/2),27,y+4,10,MUTED);}
         text(c,layout.window()==60000?UiText.t("−1분"):UiText.t("−5분"),left,top+117,10,MUTED);text(c,layout.window()==60000?UiText.t("−30초"):UiText.t("−2분30초"),392,top+117,10,MUTED);text(c,UiText.t("지금"),740,top+117,10,MUTED);
@@ -46,7 +51,7 @@ public final class GraphRenderer {
         int saved=c.save();c.clipRect(left,plotTop,right,bottom);
         for(int i=0;i<series.size();i++){
             if(!series.valid[i]){connected=false;continue;}
-            float v=Telemetry.displayValue(signal,series.values[i]);
+            float v=torqueUnit.displayValue(signal,series.values[i]);
             float x=right-(now-series.times[i])*(right-left)/layout.window(),y=bottom-(v-lo)/(hi-lo)*(bottom-plotTop);
             if(!connected||series.breakBefore[i]||series.times[i]-previous>2000)path.moveTo(x,y);else path.lineTo(x,y);
             connected=true;previous=series.times[i];p.setStyle(Paint.Style.FILL);p.setColor(BLUE);c.drawCircle(x,y,1.4f,p);

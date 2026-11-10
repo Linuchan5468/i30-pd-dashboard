@@ -1,7 +1,6 @@
 package com.veloster.vehicle;
 
 import com.veloster.i18n.UiText;
-import com.veloster.i18n.LanguageSettings;
 import android.app.Activity;
 import android.graphics.Canvas;
 import android.os.SystemClock;
@@ -27,6 +26,7 @@ public final class VehicleDash extends View implements Runnable {
     private final GaugeEditor gaugeEditor;
     private final GraphLayout graphLayout=new GraphLayout();
     private final GraphEditor graphEditor;
+    private final DisplaySettings displaySettings;
     private final OverviewLayout overviewLayout=new OverviewLayout();
     private int overviewDown=-1;
     private boolean cluster, media, gauges, graphs, touching;
@@ -49,6 +49,7 @@ public final class VehicleDash extends View implements Runnable {
     private VehicleDash(Activity a) { super(a); activity=a; artwork=new ArtworkLoader(a,this);
         gaugeEditor=new GaugeEditor(a,gaugeLayout,new Runnable(){public void run(){invalidate();}});
         graphEditor=new GraphEditor(a,graphLayout,new Runnable(){public void run(){invalidate();}});
+        displaySettings=new DisplaySettings(a,new Runnable(){public void run(){invalidate();}});
         for(int i=0;i<Telemetry.LABELS.length;i++)try{
             overviewLayout.style(i,a.getSharedPreferences("pit_vehicle_ui",0).getInt("overview_style_"+i,2));
         }catch(IllegalArgumentException e){/* Retain default for an invalid saved style. */}
@@ -86,10 +87,10 @@ public final class VehicleDash extends View implements Runnable {
     public static void pauseStandalone(Activity a){
         VehicleDash d=current.get();if(d==null||d.activity!=a)return;
         d.resumed=false;d.touching=false;d.removeCallbacks(d.editHold);
-        d.gaugeEditor.dismiss();d.graphEditor.dismiss();d.mediaReceiver.stop();d.artwork.close();
+        d.gaugeEditor.dismiss();d.graphEditor.dismiss();d.displaySettings.dismiss();d.mediaReceiver.stop();d.artwork.close();
     }
     private void showDashboard(){setVisibility(VISIBLE);if(entry!=null)entry.setVisibility(GONE);bringToFront();}
-    private void close() { entryRequestUntil=0;removeCallbacks(editHold);touching=false;gaugeEditor.dismiss();graphEditor.dismiss();setVisibility(GONE); if(entry!=null) entry.setVisibility(blocked?GONE:VISIBLE); }
+    private void close() { entryRequestUntil=0;removeCallbacks(editHold);touching=false;gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();setVisibility(GONE); if(entry!=null) entry.setVisibility(blocked?GONE:VISIBLE); }
     public static void consumeEntryIntent(Activity a){entryIntent(a,a.getIntent());}
     /** Explicit opt-in only; consume once and require a live unrestricted OEM response. */
     public static void entryIntent(Activity a,android.content.Intent intent){
@@ -152,7 +153,7 @@ public final class VehicleDash extends View implements Runnable {
     public static void hscanJsn(int cid,int funcLow,byte[] data){DATA.hscanJsn(cid,funcLow,data,SystemClock.elapsedRealtime());}
     public static void hscanJsn(int cid,int funcLow,byte[] data,long receivedAt){DATA.hscanJsn(cid,funcLow,data,receivedAt);}
     protected void onAttachedToWindow() { super.onAttachedToWindow(); artwork.open();mediaReceiver.start(activity); post(this); }
-    protected void onDetachedFromWindow() { removeCallbacks(this);removeCallbacks(editHold);touching=false;gaugeEditor.dismiss();graphEditor.dismiss();mediaReceiver.stop();artwork.close();super.onDetachedFromWindow(); }
+    protected void onDetachedFromWindow() { removeCallbacks(this);removeCallbacks(editHold);touching=false;gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();mediaReceiver.stop();artwork.close();super.onDetachedFromWindow(); }
     public void run() {
         long delay=100;
         long tick=SystemClock.elapsedRealtime();
@@ -173,6 +174,7 @@ public final class VehicleDash extends View implements Runnable {
         renderer.setGaugeLayout(gauges?gaugeLayout:null);
         renderer.setGraphLayout(graphs?graphLayout:null);
         renderer.setOverviewLayout(overviewLayout);
+        renderer.setTorqueUnit(DisplaySettings.torqueUnit(activity));
         renderer.draw(c,getWidth(),getHeight(),cluster,DATA,now,shiftTarget,media,track);
     }
     private void requestMedia(final int command){
@@ -235,12 +237,12 @@ public final class VehicleDash extends View implements Runnable {
             invalidate();return true;
         }
         if(!tap || blocked || y<8 || y>46 || downY<8 || downY>46)return true;
-        gaugeEditor.dismiss();graphEditor.dismiss();
+        gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();
         if(x>=144 && x<=244 && downX>=144 && downX<=244) { cluster=false;gauges=false;graphs=false;invalidate(); }
         else if(x>=250 && x<=322 && downX>=250 && downX<=322) { cluster=true;gauges=false;graphs=false;invalidate(); }
         else if(x>=328 && x<=412 && downX>=328 && downX<=412) { gauges=true;cluster=false;graphs=false;invalidate(); }
         else if(x>=418 && x<=528 && downX>=418 && downX<=528) { graphs=true;gauges=false;cluster=false;invalidate(); }
-        else if(x>=534 && x<=582 && downX>=534 && downX<=582){LanguageSettings.show(activity,new Runnable(){public void run(){invalidate();}});}
+        else if(x>=534 && x<=582 && downX>=534 && downX<=582){displaySettings.show();}
         else if(x>=666 && x<=782 && downX>=666 && downX<=782)close();
         return true;
     }

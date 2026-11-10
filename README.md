@@ -10,9 +10,11 @@ Work was observed on **one Korean Hyundai i30 PD N Line with a 7-speed DCT**, us
 
 ## Download and install
 
-Current PD artifact: [i30-PD-Dashboard-v1.0.0-API17.apk](apks/i30-PD-Dashboard-v1.0.0-API17.apk), **i30 PD v1.0.0** (`versionName=1.0.0-pd`, `versionCode=12`). This 2026-11-10 rebuild starts the independent PD version series. Its DEX and compiled resources are identical to the historical v11 APK; only manifest version attributes and signing/ZIP metadata differ. Package name and signing certificate are retained for the existing update path. Offline integrity, signature and payload checks passed; this new APK has not been installed or tested on the vehicle. [Build provenance](docs/PD_1.0.0_BUILD_PROVENANCE.json).
+Current development APK: [i30-PD-Dashboard-v1.1.0-API17.apk](apks/i30-PD-Dashboard-v1.1.0-API17.apk), **i30 PD v1.1.0** (`versionName=1.1.0-pd`, `versionCode=13`). Adds a saved N·m / kgf·m torque display setting. The exact installed APK passed synthetic-input display, save/cancel and process-restart checks in the existing ARM32 QEMU/API17 emulator. Package name and signing certificate are retained for the existing update path. No new vehicle installation or cold-boot test has been performed. See [validation details](docs/PD_VALIDATION.md) and [build provenance](docs/PD_1.1.0_BUILD_PROVENANCE.json).
 
-The last vehicle-installed/readback-matched artifact remains [historical PD v11 / 2.0-pdkr](apks/N-Dashboard-v11-PD-API17.apk), from 2026-10-29. Its initial final-UI check was performed with ignition off and AVN power retained. The owner subsequently confirmed that the app runs after a cold boot and retains its saved settings. These are historical vehicle observations, not a new v1.0.0 installation test. [Validation details](docs/PD_VALIDATION.md).
+The latest published GitHub Release remains [v1.0.0](https://github.com/Linuchan5468/i30-pd-dashboard/releases/tag/v1.0.0). Its historical [build provenance](docs/PD_1.0.0_BUILD_PROVENANCE.json) remains available; v1.1.0 is a separate development build.
+
+The last vehicle-installed/readback-matched artifact remains [historical PD v11 / 2.0-pdkr](apks/N-Dashboard-v11-PD-API17.apk), from 2026-10-29. Its initial final-UI check was performed with ignition off and AVN power retained. The owner subsequently confirmed that the app runs after a cold boot and retains its saved settings. These are historical vehicle observations, not a new v1.0.0 or v1.1.0 vehicle installation test. [Validation details](docs/PD_VALIDATION.md).
 
 ```sh
 python3 scripts/verify_release.py
@@ -28,6 +30,7 @@ PD releases use an independent `MAJOR.MINOR.PATCH` series starting at **1.0.0**.
 
 ## PD changes
 
+- Torque display units selectable under **SET → Torque unit** (Korean: **설정 → 토크 단위**). Choose N·m or kgf·m and save; the choice persists across app restarts. The overview, gauge values/scales and graph values/history/axes use the same selected unit. Conversion uses **1 kgf·m = 9.80665 N·m**, with one decimal place. Default is N·m. Received values and power calculations stay in N·m; missing values remain unavailable. Language selection is also under SET.
 - PD RPM/speed reception, separate throttle and accelerator-pedal values, coolant/intake/ambient temperatures, brake pressure, steering angle/rate and longitudinal/lateral acceleration.
 - P/R/N and D1–D7 display with fresh selector/gear pairing. The owner confirmed P/R/N and every forward gear D1–D7 on the vehicle.
 - Four tire pressures; parked cluster comparison was 32/32/32/31 psi. Other encoded units have host conversion tests only.

@@ -10,6 +10,8 @@ import java.util.Locale;
 /** Draws six or twelve cards below the shared navigation. */
 public final class GaugeRenderer {
     private final Paint p=new Paint(3);
+    private TorqueUnit torqueUnit=TorqueUnit.NEWTON_METRE;
+    public void setTorqueUnit(TorqueUnit value){torqueUnit=value==null?TorqueUnit.NEWTON_METRE:value;}
     private static final int BLUE=0xffa4d9ef,WHITE=0xffe1edf2,MUTED=0xff8299a4,LINE=0xff293943;
     private void text(Canvas c,String s,float x,float y,float size,int color){p.setStyle(Paint.Style.FILL);p.setColor(color);p.setTypeface(Typeface.DEFAULT);p.setTextAlign(Paint.Align.CENTER);p.setTextSize(size);c.drawText(s,x,y,p);}
     private void line(Canvas c,float x,float y,float xx,float yy,int color,float width){p.setColor(color);p.setStrokeWidth(width);c.drawLine(x,y,xx,yy,p);}
@@ -35,7 +37,7 @@ public final class GaugeRenderer {
         Telemetry.Sample[] samples=data.snapshot(now);
         for(int slot=0;slot<layout.count();slot++){
             int i=layout.signal(slot),style=layout.style(slot);Telemetry.Sample s=samples[i];
-            String u=Telemetry.UNITS[i];float l=layout.left(slot),t=layout.top(slot),cx=l+layout.width()/2;
+            String u=torqueUnit.unit(i);float l=layout.left(slot),t=layout.top(slot),cx=l+layout.width()/2;
             // Scale the same card design uniformly; dense cards remain centered in their wider cell.
             int cardSave=c.save();float scale=layout.dense()?124f/190:1;
             c.translate(cx-126*scale,t);c.scale(scale,scale);l=0;t=0;cx=126;
@@ -43,10 +45,12 @@ public final class GaugeRenderer {
             p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1);p.setColor(LINE);c.drawRoundRect(new RectF(l,t,l+252,t+190),10,10,p);p.setStyle(Paint.Style.FILL);
             text(c,UiText.t(Telemetry.LABELS[i]),cx,t+25,17,BLUE);
             boolean ok=s.valid&&!Float.isNaN(s.value)&&!Float.isInfinite(s.value);
-            float displayed=Telemetry.displayValue(i,s.value);
+            float displayed=torqueUnit.displayValue(i,s.value);
             boolean position=ok&&!Float.isNaN(displayed)&&!Float.isInfinite(displayed);
             String value=ok?(i==8?Telemetry.gearLabel((int)s.value):String.format(Locale.US,"rpm".equals(u)||"km/h".equals(u)?"%.0f":"G".equals(u)?"%+.2f":i==Telemetry.STEERING?"%+.1f":"%.1f",displayed)):"—";
-            float lo=min(i,u),hi=max(i,u),f=position?Math.max(0,Math.min(1,(displayed-lo)/(hi-lo))):0;
+            float lo=min(i,Telemetry.UNITS[i]),hi=max(i,Telemetry.UNITS[i]);
+            if(i==Telemetry.TORQUE){lo=torqueUnit.fromNewtonMetres(lo);hi=torqueUnit.fromNewtonMetres(hi);}
+            float f=position?Math.max(0,Math.min(1,(displayed-lo)/(hi-lo))):0;
             if(style==0){
                 float cy=t+107,r=63;
                 p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(5);p.setColor(LINE);RectF arc=new RectF(cx-r,cy-r,cx+r,cy+r);c.drawArc(arc,150,240,false,p);

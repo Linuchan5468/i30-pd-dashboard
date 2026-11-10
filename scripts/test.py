@@ -21,6 +21,7 @@ def main():
     javac = java.with_name("javac.exe" if os.name == "nt" else "javac")
     hub = ROOT / "apps/hub/src/com/veloster/carplayhub"
     sources = [ROOT / "shared/src/com/veloster/vehicle/Telemetry.java",
+               ROOT / "shared/src/com/veloster/vehicle/TorqueUnit.java",
                ROOT / "shared/src/com/veloster/vehicle/PdPowertrain.java",
                ROOT / "shared/src/com/veloster/vehicle/PdGearState.java",
                ROOT / "shared/src/com/veloster/vehicle/OverviewLayout.java",
