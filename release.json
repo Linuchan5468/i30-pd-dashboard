@@ -1,10 +1,23 @@
 {
-  "release_date": "2026-11-03",
+  "release_date": "2026-11-10",
   "scope": "PD fork: one Korean i30 PD N Line DCT7, pd_kr / eng.vmadmin.20260114.084130; legacy JSN artifacts retained",
   "license": "MIT (project-authored code only)",
   "signer_certificate_sha256": "c8a2e9bccf597c2fb6dc66bee293fc13f2fc47ec77bc6b2b0d52c11f51192ab8",
   "signing_note": "Public AOSP platform test certificate; not a private publisher identity or OTA signing key. No private keys distributed.",
   "apks": [
+    {
+      "file": "apks/i30-PD-Dashboard-v1.0.0-API17.apk",
+      "package": "com.veloster.dashboard",
+      "pd_version": "1.0.0",
+      "version_code": 12,
+      "version_name": "1.0.0-pd",
+      "sha256": "6a0e936f7d0e79f498cdd00daffcab180ed573d8f64d29432eff1045cd907e99",
+      "bytes": 67031,
+      "vehicle_install_observed": false,
+      "installer_profile": "pd_kr",
+      "artifact_role": "current_pd_release",
+      "scope": "Independent PD version series. Version-metadata rebuild on2026-11-10; DEX and compiled resources equal historical v11; only manifest version attributes and signing/ZIP metadata differ. Offline V1 signature, signer continuity, alignment and payload checks passed. No new vehicle/emulator installation or settings/cold-boot verification."
+    },
     {
       "file": "apks/N-Dashboard-v11-PD-API17.apk",
       "package": "com.veloster.dashboard",
@@ -14,7 +27,8 @@
       "bytes": 67050,
       "vehicle_install_observed": true,
       "installer_profile": "pd_kr",
-      "scope": "2026-10-29 installed/readback-matched. Owner subsequently confirmed cold-boot app execution/settings retention, P/R/N/D1–D7 and individual TCS/ESC ON/OFF behavior (report received2026-11-03). Oil unavailable from AVN receive path; vehicle has no e-LSD. Earlier capture/replay evidence remains separately documented."
+      "scope": "2026-10-29 installed/readback-matched. Owner subsequently confirmed cold-boot app execution/settings retention, P/R/N/D1–D7 and individual TCS/ESC ON/OFF behavior (report received2026-11-03). Oil unavailable from AVN receive path; vehicle has no e-LSD. Earlier capture/replay evidence remains separately documented.",
+      "artifact_role": "historical_vehicle_verified"
     },
     {
       "file": "apks/N-Dashboard-v6-API17.apk",
@@ -81,5 +95,13 @@
   "languages": [
     "ko",
     "en"
-  ]
+  ],
+  "pd_versioning": {
+    "series": "i30 PD",
+    "scheme": "MAJOR.MINOR.PATCH, independent of upstream and historical v7-v11 labels",
+    "current_version": "1.0.0",
+    "current_artifact": "apks/i30-PD-Dashboard-v1.0.0-API17.apk",
+    "android_version_code_policy": "Monotonically increasing update counter; 12 follows installed historical code11",
+    "unchanged_companion_versions": true
+  }
 }

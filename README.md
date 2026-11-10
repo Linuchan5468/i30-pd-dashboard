@@ -6,11 +6,13 @@ This fork adds a PD-specific receive decoder and dashboard presentation. Origina
 
 ## Confirmed target and scope
 
-Work was observed on **one Korean Hyundai i30 PD N Line with a 7-speed DCT**, using the factory Gen5 Android 4.2.2/API17 head unit: product `pd_kr`, incremental build `eng.vmadmin.20260114.084130` (firmware `PD.KOR.SOP.V141.260114.STD_H`). Other years, trims, engines, regions, firmware builds and ordinary Android devices have not been validated. The socket receiver retains an exact product/build gate. JSN code remains, but the PD v11 APK has not been retested on a Veloster N.
+Work was observed on **one Korean Hyundai i30 PD N Line with a 7-speed DCT**, using the factory Gen5 Android 4.2.2/API17 head unit: product `pd_kr`, incremental build `eng.vmadmin.20260114.084130` (firmware `PD.KOR.SOP.V141.260114.STD_H`). Other years, trims, engines, regions, firmware builds and ordinary Android devices have not been validated. The socket receiver retains an exact product/build gate. JSN code remains, but these PD APKs have not been retested on a Veloster N.
 
 ## Download and install
 
-Current PD artifact: [N-Dashboard-v11-PD-API17.apk](apks/N-Dashboard-v11-PD-API17.apk), version **11 / 2.0-pdkr**. This is the actual installed/readback-matched artifact from 2026-10-29. Its initial final-UI check was performed with ignition off and AVN power retained. The owner subsequently confirmed that the app runs after a cold boot and retains its saved settings. [Validation details](docs/PD_VALIDATION.md).
+Current PD artifact: [i30-PD-Dashboard-v1.0.0-API17.apk](apks/i30-PD-Dashboard-v1.0.0-API17.apk), **i30 PD v1.0.0** (`versionName=1.0.0-pd`, `versionCode=12`). This 2026-11-10 rebuild starts the independent PD version series. Its DEX and compiled resources are identical to the historical v11 APK; only manifest version attributes and signing/ZIP metadata differ. Package name and signing certificate are retained for the existing update path. Offline integrity, signature and payload checks passed; this new APK has not been installed or tested on the vehicle. [Build provenance](docs/PD_1.0.0_BUILD_PROVENANCE.json).
+
+The last vehicle-installed/readback-matched artifact remains [historical PD v11 / 2.0-pdkr](apks/N-Dashboard-v11-PD-API17.apk), from 2026-10-29. Its initial final-UI check was performed with ignition off and AVN power retained. The owner subsequently confirmed that the app runs after a cold boot and retains its saved settings. These are historical vehicle observations, not a new v1.0.0 installation test. [Validation details](docs/PD_VALIDATION.md).
 
 ```sh
 python3 scripts/verify_release.py
@@ -19,6 +21,10 @@ python3 scripts/verify_release.py
 [PD installation and launch](docs/INSTALL_PD.md) explains target checks, backups and ADB commands. The inherited `scripts/install.py` and OEM menu tools remain **JSN-profile tools**, not PD installers. They select upstream JSN artifacts; this fork does not publish modified OEM menu APKs. My Apps v10 is retained unchanged as an optional upstream companion. Its configuration and PD limitations are described in the PD installation guide.
 
 APKs use the public AOSP platform test certificate for compatibility. It is not a private publisher identity. No signing private keys are included. See [NOTICE.md](NOTICE.md) and [release.json](release.json).
+
+## PD version policy
+
+PD releases use an independent `MAJOR.MINOR.PATCH` series starting at **1.0.0**. Future fixes increment PATCH, added functionality increments MINOR, and incompatible changes increment MAJOR. Android displays the PD suffix (`1.0.0-pd`); filenames use the public PD version. The internal Android `versionCode` continues increasing from 12 to preserve upgrades from installed code11; it is not the public release number. Original JSN and unchanged My Apps artifacts retain their historical versions. Version numbers do not expand the confirmed vehicle or validation scope.
 
 ## PD changes
 

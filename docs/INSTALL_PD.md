@@ -24,14 +24,14 @@ adb -s SERIAL shell dumpsys package com.veloster.dashboard
 adb -s SERIAL shell pm path com.veloster.dashboard
 ```
 
-4. Install the PD APK and request launch:
+4. Install the current PD v1.0.0 APK and request launch. This version-metadata rebuild passed offline checks; its new APK has not been installed on the vehicle. Historical vehicle checks refer to v11 and earlier builds:
 
 ```sh
-adb -s SERIAL install -r apks/N-Dashboard-v11-PD-API17.apk
+adb -s SERIAL install -r apks/i30-PD-Dashboard-v1.0.0-API17.apk
 adb -s SERIAL shell am start -n com.veloster.dashboard/.DashboardActivity
 ```
 
-Check the actual screen and values while parked. An accepted command does not prove useful telemetry. Signature mismatch/unsupported target requires investigation; no permission-policy bypass is provided. The app retains package name `com.veloster.dashboard` to preserve the tested update path.
+Check the actual screen and values while parked. An accepted command does not prove useful telemetry. Signature mismatch/unsupported target requires investigation; no permission-policy bypass is provided. The app retains package name `com.veloster.dashboard` and the same signing certificate. Its internal versionCode12 is higher than historical v11, so the new public label 1.0.0 is not an Android downgrade. Update acceptance and saved settings still need checking on the vehicle. The historical installed APK remains available as provenance; installing a lower-code APK over this update may be rejected.
 
 The factory launcher may hide sideloaded apps. Use an existing reachable launcher or the unchanged optional My Apps v10 companion. To install and request opening that companion while parked:
 
@@ -42,6 +42,6 @@ adb -s SERIAL shell am start -n com.veloster.carplayhub/.HubActivity
 
 Its Quick entry setting is opt-in: choose Floating + notification, save, then verify HOME → edge button → My Apps → N Dashboard on the actual screen. If no usable shortcut appears, retain ADB access or use your existing launcher. The owner's dashboard cold-boot confirmation does not separately validate every My Apps shortcut/boot-restoration behavior.
 
-**The retained `scripts/install.py`/OEM menu profile targets JSN and does not install PD v11.** Neither dashboard nor companion APK creates a PD OEM menu entry. The JSN OEM menu procedure is outside this PD guide.
+**The retained `scripts/install.py`/OEM menu profile targets JSN and does not install PD APKs.** Neither dashboard nor companion APK creates a PD OEM menu entry. The JSN OEM menu procedure is outside this PD guide.
 
 No PC is needed for the app's existing receive path after launch. The owner confirmed app execution and retained settings after a cold boot. Automatic full-screen launch at boot is not implied by that confirmation. No new ADB or vehicle operation was performed to prepare this public PR.
