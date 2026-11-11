@@ -2,14 +2,23 @@ package com.veloster.vehicle;
 
 /** Six or twelve display slots. Preferences never write vehicle settings. */
 public final class GaugeLayout {
-    public static final int SLOTS=12;
+    public static final int SLOTS=12,STYLE_GFORCE=3;
     private static final int[] DEFAULT_SIGNALS={0,7,9,1,2,10,11,12,15,16,17,13};
     private final int[] signals=new int[SLOTS], styles=new int[SLOTS];
-    private boolean dense;
+    private boolean dense,pdProfile;
     public GaugeLayout(){reset();}
     private static void slot(int i){if(i<0||i>=SLOTS)throw new IllegalArgumentException("slot");}
     public int signal(int i){slot(i);return signals[i];}
     public int style(int i){slot(i);return styles[i];}
+    public void pdProfile(boolean value){pdProfile=value;}
+    public boolean pdProfile(){return pdProfile;}
+    public static boolean gForceSignal(int signal){return signal==11||signal==12;}
+    /** Stored style indices 0..2 retain their existing meaning. */
+    public int styleCount(int signal){return pdProfile&&gForceSignal(signal)?4:3;}
+    public int displayStyle(int i){
+        int selected=style(i);
+        return selected==STYLE_GFORCE&&!pdProfile?2:selected;
+    }
     public int count(){return dense?12:6;}
     public int columns(){return dense?4:3;}
     public boolean dense(){return dense;}
@@ -20,8 +29,14 @@ public final class GaugeLayout {
     public float height(){return dense?124:190;}
     public void set(int i,int signal,int style){
         slot(i);
-        if(signal<0||signal>=Telemetry.LABELS.length||style<0||style>2)throw new IllegalArgumentException("gauge selection");
+        if(signal<0||signal>=Telemetry.LABELS.length||style<0||style>STYLE_GFORCE
+                ||(style==STYLE_GFORCE&&!gForceSignal(signal)))throw new IllegalArgumentException("gauge selection");
         signals[i]=signal;styles[i]=style;
+    }
+    /** A 2D plot cannot carry over to an unrelated signal when editing its source. */
+    public void source(int i,int signal){
+        int selected=style(i);
+        set(i,signal,selected==STYLE_GFORCE&&!gForceSignal(signal)?2:selected);
     }
     public void swap(int a,int b){slot(a);slot(b);int n=signals[a];signals[a]=signals[b];signals[b]=n;n=styles[a];styles[a]=styles[b];styles[b]=n;}
     public void reset(){for(int i=0;i<SLOTS;i++){signals[i]=DEFAULT_SIGNALS[i];styles[i]=i<3?0:2;}}

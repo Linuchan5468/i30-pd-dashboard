@@ -1,10 +1,24 @@
 {
-  "release_date": "2026-11-10",
+  "release_date": "2026-11-11",
   "scope": "PD fork: one Korean i30 PD N Line DCT7, pd_kr / eng.vmadmin.20260114.084130; legacy JSN artifacts retained",
   "license": "MIT (project-authored code only)",
   "signer_certificate_sha256": "c8a2e9bccf597c2fb6dc66bee293fc13f2fc47ec77bc6b2b0d52c11f51192ab8",
   "signing_note": "Public AOSP platform test certificate; not a private publisher identity or OTA signing key. No private keys distributed.",
   "apks": [
+    {
+      "file": "apks/i30-PD-Dashboard-v1.2.0-API17.apk",
+      "package": "com.veloster.dashboard",
+      "pd_version": "1.2.0",
+      "version_code": 21,
+      "version_name": "1.2.0-pd",
+      "sha256": "ab52c385496e90fa9affa5384bc41ec022f85e1763da4189a15a0a67d56ab119",
+      "bytes": 213240,
+      "vehicle_install_observed": false,
+      "installer_profile": "pd_kr",
+      "artifact_role": "current_pd_release",
+      "emulator_test_observed": true,
+      "scope": "G-force plots, acceleration receipt-time estimates, scrollable tabs, circuit/course selector and manual/GPS-estimated lap timer. Existing ARM32/API17 QEMU synthetic speed and location-provider tests; no new vehicle installation or calibrated timing/GPS accuracy validation."
+    },
     {
       "file": "apks/i30-PD-Dashboard-v1.1.0-API17.apk",
       "package": "com.veloster.dashboard",
@@ -15,7 +29,7 @@
       "bytes": 69180,
       "vehicle_install_observed": false,
       "installer_profile": "pd_kr",
-      "artifact_role": "current_pd_release",
+      "artifact_role": "published_pd_1.1.0",
       "scope": "Persistent N·m / kgf·m display selection across overview, gauges and graphs. Offline checks and existing QEMU/API17 synthetic-input UI/save/cancel/app-restart tests passed. No new vehicle installation, sensor accuracy or guest/vehicle cold-boot test.",
       "emulator_test_observed": true
     },
@@ -105,7 +119,7 @@
       "scope": "Historical installed release; no universal compatibility claim."
     }
   ],
-  "release_tag": "v1.1.0",
+  "release_tag": "v1.2.0",
   "languages": [
     "ko",
     "en"
@@ -113,10 +127,10 @@
   "pd_versioning": {
     "series": "i30 PD",
     "scheme": "MAJOR.MINOR.PATCH, independent of upstream and historical v7-v11 labels",
-    "current_version": "1.1.0",
-    "current_artifact": "apks/i30-PD-Dashboard-v1.1.0-API17.apk",
-    "android_version_code_policy": "Monotonically increasing update counter; current13 follows code12 (PD1.0.0) and historicalcode11",
+    "current_version": "1.2.0",
+    "current_artifact": "apks/i30-PD-Dashboard-v1.2.0-API17.apk",
+    "android_version_code_policy": "Monotonically increasing update counter; current21 follows published13 (PD1.1.0),12 (PD1.0.0) and historical11; intermediate values were development builds",
     "unchanged_companion_versions": true
   },
-  "previous_published_release_tag": "v1.0.0"
+  "previous_published_release_tag": "v1.1.0"
 }

@@ -41,10 +41,13 @@ public final class GaugeEditor {
             }}).setNegativeButton(UiText.t("닫기"),null));
     }
     private void source(final int slot){
-        show(new AlertDialog.Builder(activity).setTitle(UiText.t("표시 항목")).setSingleChoiceItems(UiText.list(Telemetry.LABELS),layout.signal(slot),new DialogInterface.OnClickListener(){public void onClick(DialogInterface d,int n){layout.set(slot,n,layout.style(slot));save();d.dismiss();}}).setNegativeButton(UiText.t("취소"),null));
+        show(new AlertDialog.Builder(activity).setTitle(UiText.t("표시 항목")).setSingleChoiceItems(UiText.list(Telemetry.LABELS),layout.signal(slot),new DialogInterface.OnClickListener(){public void onClick(DialogInterface d,int n){layout.source(slot,n);save();d.dismiss();}}).setNegativeButton(UiText.t("취소"),null));
     }
     private void style(final int slot){
-        show(new AlertDialog.Builder(activity).setTitle(UiText.t("게이지 모양")).setSingleChoiceItems(new String[]{UiText.t("원형"), UiText.t("막대"), UiText.t("숫자")},layout.style(slot),new DialogInterface.OnClickListener(){public void onClick(DialogInterface d,int n){layout.set(slot,layout.signal(slot),n);save();d.dismiss();}}).setNegativeButton(UiText.t("취소"),null));
+        String[] choices=layout.styleCount(layout.signal(slot))==4
+            ?new String[]{UiText.t("원형"),UiText.t("막대"),UiText.t("숫자"),UiText.t("G-force 2D")}
+            :new String[]{UiText.t("원형"),UiText.t("막대"),UiText.t("숫자")};
+        show(new AlertDialog.Builder(activity).setTitle(UiText.t("게이지 모양")).setSingleChoiceItems(choices,Math.min(layout.displayStyle(slot),choices.length-1),new DialogInterface.OnClickListener(){public void onClick(DialogInterface d,int n){layout.set(slot,layout.signal(slot),n);save();d.dismiss();}}).setNegativeButton(UiText.t("취소"),null));
     }
     private void swap(final int slot){
         String[] names=new String[layout.count()];for(int i=0;i<names.length;i++)names[i]=(i+1)+UiText.t("번 · ")+UiText.t(Telemetry.LABELS[layout.signal(i)]);

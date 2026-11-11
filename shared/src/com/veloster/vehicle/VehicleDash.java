@@ -16,6 +16,11 @@ import java.lang.ref.WeakReference;
 /** Opt-in in-activity panel; keeps the original content and all OEM controls alive. */
 public final class VehicleDash extends View implements Runnable {
     private static final Telemetry DATA=new Telemetry();
+    private static final GForceTrail GFORCE_TRAIL=new GForceTrail();
+    private static final AccelerationTimer ACCELERATION_TIMER=new AccelerationTimer();
+    private static volatile AccelerationTimerController accelerationController;
+    private static final LapTimer LAP_TIMER=new LapTimer(Cn7CircuitCatalog.korea(),10,20);
+    private static volatile LapTimerController lapController;
     private static WeakReference<VehicleDash> current=new WeakReference<VehicleDash>(null);
     private final Activity activity;
     private final PitRenderer renderer=new PitRenderer();
@@ -28,8 +33,12 @@ public final class VehicleDash extends View implements Runnable {
     private final GraphEditor graphEditor;
     private final DisplaySettings displaySettings;
     private final OverviewLayout overviewLayout=new OverviewLayout();
+    private final F1GForceLayout f1GForceLayout=new F1GForceLayout();
+    private final GForceTouch gForceTouch=new GForceTouch();
+    private final HeaderTabs headerTabs=new HeaderTabs();
+    private boolean headerTouch;
     private int overviewDown=-1;
-    private boolean cluster, media, gauges, graphs, touching;
+    private boolean cluster, media, gauges, graphs, acceleration, lap, touching;
     private float downX,downY;
     private long lastDiagnostic;
     private long lastPolicyCheck;
@@ -40,13 +49,24 @@ public final class VehicleDash extends View implements Runnable {
     private Button entry;
     private boolean blocked;
     private boolean standalone;
+    private boolean f1GForceEnabled(){return DATA.pdProfile()&&cluster&&!gauges&&!graphs&&!blocked;}
+    private boolean gForceCovered(float y){return F1GForceLayout.covered(y,media,f1GForceLayout.expanded(),mediaState.snapshot(SystemClock.elapsedRealtime()).notice);}
+    private final Runnable gForceResetHold=new Runnable(){public void run(){
+        if(gForceCovered(downY)){gForceTouch.cancel();return;}
+        if(resumed&&touching&&f1GForceEnabled()&&getVisibility()==VISIBLE&&gForceTouch.hold(SystemClock.elapsedRealtime())){
+            touching=false;GFORCE_TRAIL.reset(SystemClock.elapsedRealtime());invalidate();
+            Toast.makeText(activity,UiText.t("G-force 기록을 초기화했습니다."),Toast.LENGTH_SHORT).show();
+        }
+    }};
     private final Runnable editHold=new Runnable(){public void run(){
         if((gauges||graphs)&&touching&&!blocked&&getVisibility()==VISIBLE){
             int slot=graphs?graphLayout.hit(downX,downY):gaugeEditor.hit(downX,downY);
             if(slot>=0){touching=false;if(graphs)graphEditor.edit(slot);else gaugeEditor.edit(slot);}
         }
     }};
-    private VehicleDash(Activity a) { super(a); activity=a; artwork=new ArtworkLoader(a,this);
+    private VehicleDash(Activity a) { super(a); activity=a; artwork=new ArtworkLoader(a,this);renderer.setGForceTrail(GFORCE_TRAIL);
+        if(accelerationController==null)accelerationController=new AccelerationTimerController(a.getApplicationContext(),ACCELERATION_TIMER);
+        if(lapController==null)lapController=new LapTimerController(a.getApplicationContext(),LAP_TIMER);
         gaugeEditor=new GaugeEditor(a,gaugeLayout,new Runnable(){public void run(){invalidate();}});
         graphEditor=new GraphEditor(a,graphLayout,new Runnable(){public void run(){invalidate();}});
         displaySettings=new DisplaySettings(a,new Runnable(){public void run(){invalidate();}});
@@ -82,15 +102,18 @@ public final class VehicleDash extends View implements Runnable {
     public static void resumeStandalone(Activity a){
         VehicleDash d=current.get();if(d==null||d.activity!=a)return;
         d.resumed=true;d.artwork.open();d.mediaReceiver.start(a);
+        lapController.startListening();
         d.policy(false,"standalone-resume");d.setVisibility(VISIBLE);
     }
     public static void pauseStandalone(Activity a){
         VehicleDash d=current.get();if(d==null||d.activity!=a)return;
-        d.resumed=false;d.touching=false;d.removeCallbacks(d.editHold);
+        d.resumed=false;d.touching=false;d.gForceTouch.cancel();d.removeCallbacks(d.editHold);
+        d.headerTouch=false;d.headerTabs.cancel();lapController.stopListening(SystemClock.elapsedRealtime());
+        d.removeCallbacks(d.gForceResetHold);gForceGap(SystemClock.elapsedRealtime());
         d.gaugeEditor.dismiss();d.graphEditor.dismiss();d.displaySettings.dismiss();d.mediaReceiver.stop();d.artwork.close();
     }
-    private void showDashboard(){setVisibility(VISIBLE);if(entry!=null)entry.setVisibility(GONE);bringToFront();}
-    private void close() { entryRequestUntil=0;removeCallbacks(editHold);touching=false;gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();setVisibility(GONE); if(entry!=null) entry.setVisibility(blocked?GONE:VISIBLE); }
+    private void showDashboard(){setVisibility(VISIBLE);if(entry!=null)entry.setVisibility(GONE);bringToFront();if(resumed)lapController.startListening();}
+    private void close() { entryRequestUntil=0;removeCallbacks(editHold);removeCallbacks(gForceResetHold);touching=false;headerTouch=false;headerTabs.cancel();gForceTouch.cancel();gForceGap(SystemClock.elapsedRealtime());lapController.stopListening(SystemClock.elapsedRealtime());gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();setVisibility(GONE); if(entry!=null) entry.setVisibility(blocked?GONE:VISIBLE); }
     public static void consumeEntryIntent(Activity a){entryIntent(a,a.getIntent());}
     /** Explicit opt-in only; consume once and require a live unrestricted OEM response. */
     public static void entryIntent(Activity a,android.content.Intent intent){
@@ -115,9 +138,14 @@ public final class VehicleDash extends View implements Runnable {
     public static void hide(Activity a) {
         VehicleDash d=current.get(); if(d!=null && d.activity==a) d.close();
     }
+    public static boolean handleBack(Activity a){
+        VehicleDash d=current.get();
+        if(d!=null&&d.activity==a&&d.lap&&lapController.back()){d.invalidate();return true;}
+        return false;
+    }
     public static void resume(Activity a,boolean cachedRestriction){
         attach(a);VehicleDash d=current.get();
-        if(d!=null&&d.activity==a){d.resumed=true;d.lastPolicyCheck=SystemClock.elapsedRealtime();regulation(a,cachedRestriction);d.tryRequestedEntry();android.util.Log.i("VehicleDash","entry resume cachedRestriction="+cachedRestriction);}
+        if(d!=null&&d.activity==a){d.resumed=true;lapController.startListening();d.lastPolicyCheck=SystemClock.elapsedRealtime();regulation(a,cachedRestriction);d.tryRequestedEntry();android.util.Log.i("VehicleDash","entry resume cachedRestriction="+cachedRestriction);}
     }
     public static void pause(Activity a){VehicleDash d=current.get();if(d!=null&&d.activity==a){d.resumed=false;d.close();}}
     private void policy(boolean restricted,String source){
@@ -136,7 +164,7 @@ public final class VehicleDash extends View implements Runnable {
     public static void regulation(boolean blocked){
         VehicleDash d=current.get();if(d!=null)regulation(d.activity,blocked);
     }
-    public static void ignition(boolean on) { DATA.clear(); }
+    public static void ignition(boolean on) { long now=SystemClock.elapsedRealtime();DATA.clear();gForceGap(now);LAP_TIMER.gap(now); }
     public static void profilePd(boolean value){DATA.pdProfile(value);}
     public static void rpm(byte[] data) { DATA.rpm(data,SystemClock.elapsedRealtime()); }
     public static void beginComputed(float rpm,float tqi,float acor,float standard,float boost,float ambient) { DATA.beginComputed(rpm,tqi,acor,standard,boost,ambient); }
@@ -148,12 +176,31 @@ public final class VehicleDash extends View implements Runnable {
     public static void rearView(int data) { DATA.rearView(data); }
     public static void units(byte[] data) { DATA.units(data,SystemClock.elapsedRealtime()); }
     public static void speed(int data) { DATA.speed(data,SystemClock.elapsedRealtime()); }
-    public static void hscanPd(int cid,int function,byte[] data,long receivedAt){DATA.hscanPd(cid,function,data,receivedAt);}
+    public static void hscanPd(int cid,int function,byte[] data,long receivedAt){
+        DATA.hscanPd(cid,function,data,receivedAt);
+        if(cid==0xc7&&function==0x02&&data!=null&&data.length==4){
+            Telemetry.Sample speed=DATA.sample(7,receivedAt);
+            AccelerationTimerController controller=accelerationController;
+            if(controller!=null)controller.onSpeed(speed.value,speed.valid,receivedAt);
+            else ACCELERATION_TIMER.onSpeed(speed.value,speed.valid,receivedAt);
+        }
+        if(cid==0xc7&&function==0x13&&data!=null&&data.length==8){
+            synchronized(GFORCE_TRAIL){
+                long now=SystemClock.elapsedRealtime();
+                GFORCE_TRAIL.receive(DATA.sample(11,now),DATA.sample(12,now),now);
+            }
+        }
+    }
+    public static void gForceGap(long now){
+        GFORCE_TRAIL.breakCurrent(now);
+        AccelerationTimerController controller=accelerationController;
+        if(controller!=null)controller.gap(now);else ACCELERATION_TIMER.gap(now);
+    }
     public static void additional(byte[] data) { DATA.additional(data,SystemClock.elapsedRealtime()); }
     public static void hscanJsn(int cid,int funcLow,byte[] data){DATA.hscanJsn(cid,funcLow,data,SystemClock.elapsedRealtime());}
     public static void hscanJsn(int cid,int funcLow,byte[] data,long receivedAt){DATA.hscanJsn(cid,funcLow,data,receivedAt);}
     protected void onAttachedToWindow() { super.onAttachedToWindow(); artwork.open();mediaReceiver.start(activity); post(this); }
-    protected void onDetachedFromWindow() { removeCallbacks(this);removeCallbacks(editHold);touching=false;gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();mediaReceiver.stop();artwork.close();super.onDetachedFromWindow(); }
+    protected void onDetachedFromWindow() { removeCallbacks(this);removeCallbacks(editHold);removeCallbacks(gForceResetHold);touching=false;headerTouch=false;headerTabs.cancel();gForceTouch.cancel();gForceGap(SystemClock.elapsedRealtime());lapController.stopListening(SystemClock.elapsedRealtime());gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();mediaReceiver.stop();artwork.close();super.onDetachedFromWindow(); }
     public void run() {
         long delay=100;
         long tick=SystemClock.elapsedRealtime();
@@ -172,9 +219,14 @@ public final class VehicleDash extends View implements Runnable {
         MediaState.Snapshot track=mediaState.snapshot(now);artwork.request(track);
         renderer.setArtwork(artwork.bitmap());
         renderer.setGaugeLayout(gauges?gaugeLayout:null);
+        gaugeLayout.pdProfile(DATA.pdProfile());
+        renderer.setGForceExpanded(f1GForceLayout.expanded());
         renderer.setGraphLayout(graphs?graphLayout:null);
         renderer.setOverviewLayout(overviewLayout);
         renderer.setTorqueUnit(DisplaySettings.torqueUnit(activity));
+        renderer.setAccelerationTimer(acceleration?ACCELERATION_TIMER.snapshot(now):null,accelerationController.renderer());
+        renderer.setLapTimer(lap?lapController.snapshot(now):null,lapController.renderer());
+        renderer.setHeaderTabs(headerTabs);
         renderer.draw(c,getWidth(),getHeight(),cluster,DATA,now,shiftTarget,media,track);
     }
     private void requestMedia(final int command){
@@ -196,19 +248,39 @@ public final class VehicleDash extends View implements Runnable {
     public boolean onTouchEvent(MotionEvent event) {
         float x=event.getX()*800/getWidth(), y=event.getY()*480/getHeight();
         if(event.getAction()==MotionEvent.ACTION_DOWN) {
-            removeCallbacks(editHold);touching=true;downX=x;downY=y;
-            overviewDown=!cluster&&!gauges&&!graphs&&!blocked&&!overviewCovered(y)?overviewLayout.hit(x,y):-1;
+            removeCallbacks(editHold);removeCallbacks(gForceResetHold);touching=true;downX=x;downY=y;
+            headerTouch=!blocked&&headerTabs.down(x,y);
+            if(headerTouch){overviewDown=-1;gForceTouch.cancel();return true;}
+            gaugeLayout.pdProfile(DATA.pdProfile());
+            gForceTouch.down(x,y,f1GForceEnabled()&&!gForceCovered(y),media,f1GForceLayout.expanded(),SystemClock.elapsedRealtime());
+            overviewDown=!cluster&&!gauges&&!graphs&&!acceleration&&!lap&&!blocked&&!overviewCovered(y)?overviewLayout.hit(x,y):-1;
             if(!blocked&&((gauges&&gaugeEditor.hit(x,y)>=0)||(graphs&&graphLayout.hit(x,y)>=0)))postDelayed(editHold,600);
+            if(gForceTouch.resetCandidate())postDelayed(gForceResetHold,GForceTouch.HOLD_MS);
             return true;
         }
-        if(event.getAction()==MotionEvent.ACTION_MOVE){if(Math.abs(x-downX)>=16||Math.abs(y-downY)>=16){touching=false;removeCallbacks(editHold);}return true;}
-        if(event.getAction()==MotionEvent.ACTION_CANCEL) { touching=false;removeCallbacks(editHold);return true; }
+        if(event.getAction()==MotionEvent.ACTION_MOVE){if(headerTouch){headerTabs.move(x,y);invalidate();return true;}gForceTouch.move(x,y);if(Math.abs(x-downX)>=16||Math.abs(y-downY)>=16){touching=false;removeCallbacks(editHold);removeCallbacks(gForceResetHold);}return true;}
+        if(event.getAction()==MotionEvent.ACTION_CANCEL) { touching=false;headerTouch=false;headerTabs.cancel();gForceTouch.cancel();removeCallbacks(editHold);removeCallbacks(gForceResetHold);return true; }
         if(event.getAction()!=MotionEvent.ACTION_UP)return true;
-        removeCallbacks(editHold);
+        removeCallbacks(editHold);removeCallbacks(gForceResetHold);
+        if(headerTouch){
+            headerTouch=false;touching=false;int selected=headerTabs.up(x,y);
+            if(selected>=0&&!blocked)selectTab(selected);
+            invalidate();return true;
+        }
         boolean tap=touching && Math.abs(x-downX)<16 && Math.abs(y-downY)<16;
+        boolean gForceTap=gForceTouch.up(x,y,SystemClock.elapsedRealtime());
         touching=false;
         if(standalone&&tap&&x>=666&&x<=782&&downX>=666&&downX<=782&&y>=8&&y<=46&&downY>=8&&downY<=46){activity.finish();return true;}
-        if(tap&&!blocked&&!cluster&&!gauges&&!graphs&&overviewDown>=0&&overviewLayout.hit(x,y)==overviewDown&&!overviewCovered(y)){
+        if(tap&&!blocked&&acceleration&&y>=54&&downY>=54){
+            accelerationController.touch(x,y,SystemClock.elapsedRealtime());invalidate();return true;
+        }
+        if(tap&&!blocked&&lap&&y>=54&&downY>=54){
+            lapController.touch(x,y,SystemClock.elapsedRealtime());invalidate();return true;
+        }
+        if(tap&&f1GForceEnabled()&&!gForceCovered(downY)&&!gForceCovered(y)&&gForceTap){
+            media=f1GForceLayout.toggle(media);mediaState.dismissNotice();invalidate();return true;
+        }
+        if(tap&&!blocked&&!cluster&&!gauges&&!graphs&&!acceleration&&!lap&&overviewDown>=0&&overviewLayout.hit(x,y)==overviewDown&&!overviewCovered(y)){
             overviewLayout.cycle(overviewDown);
             activity.getSharedPreferences("pit_vehicle_ui",0).edit().putInt("overview_style_"+overviewDown,overviewLayout.style(overviewDown)).apply();
             invalidate();return true;
@@ -222,7 +294,7 @@ public final class VehicleDash extends View implements Runnable {
         if(tap&&!blocked&&cluster&&!gauges){
             boolean small=x>=18&&x<=70&&downX>=18&&downX<=70&&y>=436&&y<=480&&downY>=436&&downY<=480;
             boolean large=media&&x>=518&&x<=758&&downX>=518&&downX<=758&&y>=72&&y<=312&&downY>=72&&downY<=312;
-            if(small||large){media=!media;mediaState.dismissNotice();invalidate();return true;}
+            if(small||large){media=DATA.pdProfile()?f1GForceLayout.toggleMedia(media):!media;mediaState.dismissNotice();invalidate();return true;}
         }
         if(tap && !blocked && cluster && y>=452 && y<=480 && downY>=452 && downY<=480) {
             if(media && x>=494 && x<=580 && downX>=494 && downX<=580){requestMedia(-1);return true;}
@@ -237,13 +309,13 @@ public final class VehicleDash extends View implements Runnable {
             invalidate();return true;
         }
         if(!tap || blocked || y<8 || y>46 || downY<8 || downY>46)return true;
-        gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();
-        if(x>=144 && x<=244 && downX>=144 && downX<=244) { cluster=false;gauges=false;graphs=false;invalidate(); }
-        else if(x>=250 && x<=322 && downX>=250 && downX<=322) { cluster=true;gauges=false;graphs=false;invalidate(); }
-        else if(x>=328 && x<=412 && downX>=328 && downX<=412) { gauges=true;cluster=false;graphs=false;invalidate(); }
-        else if(x>=418 && x<=528 && downX>=418 && downX<=528) { graphs=true;gauges=false;cluster=false;invalidate(); }
-        else if(x>=534 && x<=582 && downX>=534 && downX<=582){displaySettings.show();}
-        else if(x>=666 && x<=782 && downX>=666 && downX<=782)close();
+        if(x>=666 && x<=782 && downX>=666 && downX<=782)close();
         return true;
+    }
+    private void selectTab(int id){
+        gaugeEditor.dismiss();graphEditor.dismiss();displaySettings.dismiss();
+        if(id==6){displaySettings.show();return;}
+        cluster=id==1;gauges=id==2;graphs=id==3;acceleration=id==4;lap=id==5;
+        if(lap&&resumed)lapController.startListening();
     }
 }

@@ -2,6 +2,21 @@
 
 This file covers the PD adaptation against upstream/fork baseline `2be141b` (2026-10-26 UI release). The original seven commits are ancestors of this branch. Upstream's later optional Performance dashboard commit is not included in this PD change. Dates describe development, validation or repository work as stated, not GitHub Release publication dates. PD now uses an independent MAJOR.MINOR.PATCH series; historical v7–v11 labels remain as evidence identifiers.
 
+## i30 PD 1.2.0 — 2026-11-11
+
+- Added PD G-force 2D gauges and expandable F1 plots with shared received-point history. Set the circular range to ±1 G and display positive longitudinal acceleration below center for weight transfer. Numeric readings retain their received signs.
+- Applied the inspected CN7 N dotted-contour and radius-based blue/purple/red color rules. The independently implemented history retains 16 directional maxima and 18 recent distinct points. Directional peak labels appear on larger plots. Explicit hold resets the session history.
+- Added an acceleration-test tab with 10 km/h interval selection, arm/cancel and the ten most recent successful results. Selection and completed records persist. The CN7 speed-state rule starts a zero-start test at 1 km/h and a rolling test above the selected initial speed.
+- Estimate crossing times between actual decoded PD CLU11 receipts. Disconnects, invalid data, reversed times, background loss and gaps over one second interrupt active measurements. These are AVN receipt-time estimates with field accuracy awaiting validation.
+- Added horizontal scrolling to the top tabs, keeping the clock and return control fixed. Swiping does not activate a tab.
+- Added manual and GPS-estimated lap timing, saved completed laps, best/last times and a Korean catalog of four circuits and six courses. Circuit selection follows the inspected N navigation flow: choose a circuit from the list, then a numbered course; the map and saved selection update immediately. Selection is locked while a measurement is active.
+- Reconstructed course maps from the original COURSE link coordinates rather than circuit AREA outlines. Each link is drawn separately; KIC GP/Standing and Inje Full/A retain their distinct routes. The PD selection screen and artwork are independently implemented.
+- GPS timing uses the source start/goal points with a 10 m proximity policy, 20 m rearm distance and independent minimum-time/distance guards. It uses ordinary Android GPS updates and requires precise-location permission. This is an estimate without the original navigation map-matching service; real-vehicle GPS lap timing has not been validated.
+- Fixed API17 local-socket idle reads reported as `IOException: Try again` so they do not unnecessarily reconnect the HSCAN receiver or interrupt measurements. EOF and other connection failures still invalidate the stream.
+- Corrected overlapping lap/selector titles and replaced a missing dropdown font glyph with a drawn triangle. Fresh GPS fixes clear inactive warmup warnings; interruption reasons remain visible. Hardware Back closes the circuit selector first.
+- Release APK: `i30-PD-Dashboard-v1.2.0-API17.apk`, versionName `1.2.0-pd`, versionCode21, existing package/certificate. SHA-256 `ab52c385496e90fa9affa5384bc41ec022f85e1763da4189a15a0a67d56ab119`.
+- Checked the final APK in the ARM32 QEMU/API17 emulator. A synthetic GPS route completed one Taebaek lap of120,953ms; course selection and the completed record survived process restart. The v20 normal-receiver acceleration test recorded9,521ms against9,411ms at the sender (+110ms), exceeding the100ms comparison threshold by10ms. The final UI-only build retains that timer/receiver logic. These are functional tests, not timing-accuracy or vehicle validation. No new vehicle installation, driving or cold-boot test was performed.
+
 ## i30 PD 1.1.0 — 2026-11-10
 
 - Added persisted N·m / kgf·m torque display selection under SET → Torque unit (설정 → 토크 단위). Default remains N·m; save/cancel are explicit, and language selection remains available under SET.
