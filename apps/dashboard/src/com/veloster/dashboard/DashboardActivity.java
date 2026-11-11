@@ -24,4 +24,5 @@ public final class DashboardActivity extends Activity {
     protected void onResume(){super.onResume();LanguageSettings.init(this);VehicleDash.resumeStandalone(this);client.start();}
     protected void onPause(){client.stop();VehicleDash.pauseStandalone(this);super.onPause();}
     protected void onDestroy(){if(client!=null)client.stop();super.onDestroy();}
+    public void onBackPressed(){if(!VehicleDash.handleBack(this))super.onBackPressed();}
 }

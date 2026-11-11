@@ -6,7 +6,6 @@ import android.os.SystemClock;
 import com.veloster.vehicle.VehicleDash;
 import java.io.InputStream;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayDeque;
 
 /** Additional read-only subscriber to captured hscand fanout; no OEM startup or handshake. */
@@ -67,7 +66,10 @@ final class HscanDataClient {
 
         void close() {
             // Serialize with delivery, never with a native read or queue consumer.
-            synchronized (delivery) { active = false; }
+            synchronized (delivery) {
+                if(active&&pd)VehicleDash.gForceGap(SystemClock.elapsedRealtime());
+                active = false;
+            }
             synchronized (queue) { queue.clear(); queue.notifyAll(); }
             synchronized (socketLock) { closeSocket(socket); socket = null; }
             reader.interrupt(); decoder.interrupt();
@@ -92,7 +94,10 @@ final class HscanDataClient {
                         while (active) {
                             int n;
                             try { n = input.read(buffer); }
-                            catch (SocketTimeoutException idle) { continue; }
+                            catch (IOException failure) {
+                                if(HscanReadPolicy.isIdle(failure))continue;
+                                throw failure;
+                            }
                             if (n < 0) break;
                             if (n == 0) continue;
                             receivedBytes += n;
@@ -107,6 +112,7 @@ final class HscanDataClient {
                     } catch (IOException unavailable) {
                         if (active) android.util.Log.w("NDashboard", "HSCAN receive unavailable", unavailable);
                     } finally {
+                        synchronized(delivery){if(active&&pd)VehicleDash.gForceGap(SystemClock.elapsedRealtime());}
                         synchronized (socketLock) {
                             closeSocket(current);
                             if (socket == current) socket = null;
@@ -144,7 +150,10 @@ final class HscanDataClient {
                         if (!active) break;
                         chunk = queue.removeFirst();
                     }
-                    if (chunk.sequence != previous + 1) parser.reset();
+                    if (chunk.sequence != previous + 1) {
+                        parser.reset();
+                        if(previous>=0)synchronized(delivery){if(active&&pd)VehicleDash.gForceGap(SystemClock.elapsedRealtime());}
+                    }
                     previous = chunk.sequence;
                     parser.accept(chunk.bytes, 0, chunk.bytes.length, chunk.time);
                 }

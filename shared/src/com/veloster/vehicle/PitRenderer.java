@@ -25,7 +25,15 @@ public final class PitRenderer {
     private MediaState.Snapshot music;
     private Bitmap artwork;
     private final GaugeRenderer gaugeRenderer=new GaugeRenderer();
+    private final GForcePlotRenderer gForcePlotRenderer=new GForcePlotRenderer();
     private final GraphRenderer graphRenderer=new GraphRenderer();
+    private AccelerationTimerRenderer accelerationRenderer;
+    private AccelerationTimer.Snapshot acceleration;
+    private LapTimerRenderer lapRenderer;
+    private LapTimer.Snapshot lap;
+    private HeaderTabs headerTabs=new HeaderTabs();
+    private GForceTrail gForceTrail;
+    private boolean gForceExpanded,gForcePage;
     private GraphLayout graphLayout;
     private GaugeLayout gaugeLayout;
     private TorqueUnit torqueUnit=TorqueUnit.NEWTON_METRE;
@@ -39,6 +47,11 @@ public final class PitRenderer {
         return clockText;
     }
     public void setArtwork(Bitmap value){artwork=value;}
+    public void setAccelerationTimer(AccelerationTimer.Snapshot value,AccelerationTimerRenderer renderer){acceleration=value;accelerationRenderer=renderer;}
+    public void setLapTimer(LapTimer.Snapshot value,LapTimerRenderer renderer){lap=value;lapRenderer=renderer;}
+    public void setHeaderTabs(HeaderTabs value){if(value!=null)headerTabs=value;}
+    public void setGForceTrail(GForceTrail value){gForceTrail=value;gaugeRenderer.setGForceTrail(value);}
+    public void setGForceExpanded(boolean value){gForceExpanded=value;}
     public void setGaugeLayout(GaugeLayout value){gaugeLayout=value;}
     public void setGraphLayout(GraphLayout value){graphLayout=value;}
     public void setOverviewLayout(OverviewLayout value){if(value!=null)overviewLayout=value;}
@@ -57,8 +70,9 @@ public final class PitRenderer {
         draw(c,width,height,cluster,model,now,target,false,null);
     }
     public void draw(Canvas c,int width,int height,boolean cluster,Telemetry model,long now,int target,boolean media,MediaState.Snapshot track){
-        mediaPage=cluster && media;music=track;
         pdProfile=model.pdProfile();overviewLayout.pdProfile(pdProfile);
+        if(gaugeLayout!=null)gaugeLayout.pdProfile(pdProfile);
+        gForcePage=cluster&&pdProfile&&gForceExpanded;mediaPage=cluster&&media&&!gForcePage;music=track;
         shiftTarget=ShiftGuide.clamp(target);frameTime=now;
         samples=model.snapshot(now);cue=ShiftGuide.evaluate(samples,shiftTarget);
         c.save();c.scale(width/800f,height/480f);c.drawColor(BG);
@@ -67,18 +81,23 @@ public final class PitRenderer {
         box(c,0,0,800,52,0xff090b0c);box(c,18,51,782,52,LINE);
         stroke(c,19,16,13,35,RED,4);stroke(c,27,16,21,35,BLUE,4);
         text(c,"N / PIT",36,33,23,WHITE,true);
-        button(c,UiText.t("전체 조망"),144,8,100,38,!cluster&&gaugeLayout==null&&graphLayout==null,BLUE);
-        button(c,"F1",250,8,72,38,cluster&&gaugeLayout==null&&graphLayout==null,BLUE);
-        button(c,UiText.t("게이지"),328,8,84,38,gaugeLayout!=null,BLUE);
-        button(c,UiText.t("그래프"),418,8,110,38,graphLayout!=null,BLUE);
-        button(c,UiText.t("설정"),534,8,48,38,false,BLUE);
-        centered(c,clock(),620,33,22,WHITE,true);
+        drawHeaderTabs(c,cluster);
+        centered(c,clock(),628,33,18,WHITE,true);
         button(c,UiText.t("돌아가기"),666,8,116,38,false,BLUE);
-        if(graphLayout!=null)graphRenderer.draw(c,model,now,graphLayout);
+        if(lap!=null)lapRenderer.draw(c,lap);
+        else if(acceleration!=null)accelerationRenderer.draw(c,acceleration);
+        else if(graphLayout!=null)graphRenderer.draw(c,model,now,graphLayout);
         else if(gaugeLayout!=null)gaugeRenderer.draw(c,model,now,gaugeLayout);
-        else if(mediaPage)drawCombined(c);else if(cluster)drawCluster(c);else drawDashboard(c);
-        if(graphLayout==null&&!mediaPage && music!=null && music.notice)drawMedia(c,true);
-        if(cluster&&gaugeLayout==null&&graphLayout==null)drawArtworkToggle(c);
+        else if(gForcePage)drawGForceExpanded(c);else if(mediaPage)drawCombined(c);else if(cluster)drawCluster(c);else drawDashboard(c);
+        if(lap==null&&acceleration==null&&graphLayout==null&&!mediaPage&&!gForcePage && music!=null && music.notice)drawMedia(c,true);
+        if(lap==null&&acceleration==null&&cluster&&gaugeLayout==null&&graphLayout==null)drawArtworkToggle(c);
+        c.restore();
+    }
+    private void drawHeaderTabs(Canvas c,boolean cluster){
+        String[] labels={UiText.t("전체 조망"),"F1",UiText.t("게이지"),UiText.t("그래프"),UiText.t("가속 측정"),UiText.t("랩 타이머"),UiText.t("설정")};
+        int selected=lap!=null?5:acceleration!=null?4:graphLayout!=null?3:gaugeLayout!=null?2:cluster?1:0;
+        c.save();c.clipRect(HeaderTabs.LEFT,HeaderTabs.TOP,HeaderTabs.RIGHT,HeaderTabs.BOTTOM);
+        for(int id=0;id<HeaderTabs.COUNT;id++)button(c,labels[id],headerTabs.left(id),HeaderTabs.TOP,headerTabs.width(id),HeaderTabs.BOTTOM-HeaderTabs.TOP,id==selected,BLUE);
         c.restore();
     }
     private void box(Canvas c,float l,float t,float r,float b,int color){paint.setColor(color);c.drawRect(l,t,r,b,paint);}
@@ -165,7 +184,8 @@ public final class PitRenderer {
         centered(c,"ENGINE",398,177,12,MUTED,true);
         centered(c,value("엔진 RPM"),398,253,46,WHITE,true);
         centered(c,"rpm",398,280,12,MUTED,false);
-        text(c,"OIL",32,372,11,MUTED,true);text(c,value("오일 온도")+" °C",116,375,22,WHITE,true);
+        if(pdProfile)f1GForce(c,true);
+        else{text(c,"OIL",32,372,11,MUTED,true);text(c,value("오일 온도")+" °C",116,375,22,WHITE,true);}
         text(c,"COOLANT",258,372,11,MUTED,true);text(c,value("냉각수 온도")+" °C",368,375,22,WHITE,true);
         compactPedal(c,UiText.t(pdProfile?"가속 페달 / PEDAL":"스로틀"),pdProfile?"가속 페달 %":"스로틀 %","%",32,208,BLUE,100);
         compactPedal(c,UiText.t("브레이크"),"브레이크 압력 bar","bar",258,212,RED,100);
@@ -190,6 +210,63 @@ public final class PitRenderer {
         box(c,x,432,x+width,438,LINE);
         float fraction=Math.max(0,Math.min(1,numeric(prefix)/maximum));
         if(fraction>0)box(c,x,432,x+width*fraction,438,color);
+    }
+    private static String gForceValue(boolean valid,float value){
+        return valid?String.format(Locale.US,"%+.2f G",value):"— G";
+    }
+    /** Same received-point plot for the full and media F1 layouts. */
+    private void f1GForce(Canvas c,boolean combined){
+        GForceTrail.Snapshot trail=gForceTrail==null?null:gForceTrail.snapshot(frameTime);
+        GForcePoint point=trail==null?GForcePoint.from(samples[11],samples[12]):trail.current;
+        if(point==null)point=GForcePoint.from(null,null);
+        F1GForceLayout.Plot plot=F1GForceLayout.plot(combined,false);
+        float cx=plot.x,cy=plot.y,radius=plot.radius;
+        text(c,"G-FORCE",combined?32:22,combined?302:294,10,MUTED,true);
+        text(c,point.clipped?">1 G":"±1 G",combined?32:232,combined?400:294,9,point.clipped?RED:MUTED,false);
+        gForcePlotRenderer.draw(c,trail,point,cx,cy,radius,combined?4:3.3f,combined?2.5f:2);
+        float labelX=combined?142:118,valueX=combined?176:160;
+        float lateralY=combined?363:320,longitudinalY=combined?386:345;
+        text(c,"LAT",labelX,lateralY-2,9,MUTED,true);
+        text(c,gForceValue(point.lateralValid,point.lateralG),valueX,lateralY,combined?14:17,WHITE,true);
+        text(c,"LONG",labelX,longitudinalY-2,9,MUTED,true);
+        text(c,gForceValue(point.longitudinalValid,point.longitudinalG),valueX,longitudinalY,combined?14:17,WHITE,true);
+        fitted(c,UiText.t("누르면 확대 · 길게 초기화"),combined?142:118,combined?406:363,8,combined?110:158,MUTED);
+    }
+    /** Enlarged plot keeps the same data and the normal F1 bottom controls. */
+    private void drawGForceExpanded(Canvas c){
+        text(c,cue.shift?"SHIFT ↑":"SHIFT / LED",20,83,11,cue.shift?RED:MUTED,true);
+        text(c,shiftTarget+" rpm",690,83,11,MUTED,true);
+        for(int i=0;i<15;i++){
+            boolean lit=cue.shift?(frameTime/250)%2==0:i<cue.leds;
+            paint.setColor(lit?(i<5?BLUE:i<10?WHITE:RED):0xff252a2c);
+            c.drawCircle(155+i*35,79,10,paint);
+        }
+        float rpm=Math.max(0,Math.min(8000,numeric("엔진 RPM")));
+        box(c,18,105,782,108,LINE);if(rpm>0)box(c,18,105,18+764*rpm/8000,108,BLUE);
+        panel(c,18,116,464,318,PANEL,LINE);
+        text(c,"G-FORCE",34,138,14,BLUE,true);
+        GForceTrail.Snapshot trail=gForceTrail==null?null:gForceTrail.snapshot(frameTime);
+        GForcePoint point=trail==null?GForcePoint.from(samples[11],samples[12]):trail.current;
+        if(point==null)point=GForcePoint.from(null,null);
+        text(c,point.clipped?">1 G":"±1 G",426,138,11,point.clipped?RED:MUTED,false);
+        F1GForceLayout.Plot plot=F1GForceLayout.plot(false,true);
+        gForcePlotRenderer.draw(c,trail,point,plot.x,plot.y,plot.radius,6,3.5f);
+        text(c,"LAT",34,413,10,MUTED,true);text(c,gForceValue(point.lateralValid,point.lateralG),70,415,19,WHITE,true);
+        text(c,"LONG",254,413,10,MUTED,true);text(c,gForceValue(point.longitudinalValid,point.longitudinalG),301,415,19,WHITE,true);
+        centered(c,UiText.t("누르면 축소 · 길게 초기화"),250,430,9,MUTED,false);
+        panel(c,494,116,288,318,PANEL,LINE);
+        box(c,510,132,620,260,BLUE);centered(c,"GEAR",565,151,11,BG,true);
+        centered(c,value("현재 기어"),565,238,88,BG,true);
+        centered(c,"SPEED",700,158,11,MUTED,true);centered(c,value("속도 km/h"),700,215,48,WHITE,true);
+        centered(c,"km/h",700,238,11,MUTED,false);
+        text(c,"ENGINE",510,290,11,MUTED,true);text(c,"rpm",744,290,11,MUTED,false);
+        centered(c,value("엔진 RPM"),638,333,42,WHITE,true);
+        text(c,"COOLANT",510,363,11,MUTED,true);text(c,value("냉각수 온도")+" °C",671,365,21,WHITE,true);
+        text(c,"PEDAL",510,401,10,MUTED,true);text(c,value("가속 페달 %")+" %",573,403,17,WHITE,true);
+        text(c,"BRAKE",650,401,10,MUTED,true);fitted(c,value("브레이크 압력 bar")+" bar",704,403,17,65,WHITE);
+        button(c,"−",548,452,42,27,false,BLUE);
+        text(c,UiText.t("목표 ")+shiftTarget+" rpm",604,471,12,BLUE,true);
+        button(c,"+",740,452,42,27,false,BLUE);
     }
     private void button(Canvas c,String s,float x,float y,float w,float h,boolean on,int accent){
         panel(c,x,y,w,h,on?0xff233b46:0xff111415,on?accent:LINE);
@@ -233,9 +310,12 @@ public final class PitRenderer {
         text(c,"km/h",229,148,12,MUTED,false);
         centered(c,value("속도 km/h"),150,253,88,WHITE,true);
         box(c,18,276,276,278,LINE);
-        text(c,"OIL TEMP",22,307,11,MUTED,true);
-        text(c,value("오일 온도"),175,310,22,WHITE,true);
-        text(c,"°C",250,310,11,MUTED,false);
+        if(pdProfile)f1GForce(c,false);
+        else{
+            text(c,"OIL TEMP",22,307,11,MUTED,true);
+            text(c,value("오일 온도"),175,310,22,WHITE,true);
+            text(c,"°C",250,310,11,MUTED,false);
+        }
         text(c,"ENGINE",526,148,14,MUTED,true);
         text(c,"rpm",749,148,12,MUTED,false);
         centered(c,value("엔진 RPM"),653,247,69,WHITE,true);

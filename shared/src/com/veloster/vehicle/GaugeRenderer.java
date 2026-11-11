@@ -10,7 +10,10 @@ import java.util.Locale;
 /** Draws six or twelve cards below the shared navigation. */
 public final class GaugeRenderer {
     private final Paint p=new Paint(3);
+    private final GForcePlotRenderer gForcePlot=new GForcePlotRenderer();
+    private GForceTrail gForceTrail;
     private TorqueUnit torqueUnit=TorqueUnit.NEWTON_METRE;
+    public void setGForceTrail(GForceTrail value){gForceTrail=value;}
     public void setTorqueUnit(TorqueUnit value){torqueUnit=value==null?TorqueUnit.NEWTON_METRE:value;}
     private static final int BLUE=0xffa4d9ef,WHITE=0xffe1edf2,MUTED=0xff8299a4,LINE=0xff293943;
     private void text(Canvas c,String s,float x,float y,float size,int color){p.setStyle(Paint.Style.FILL);p.setColor(color);p.setTypeface(Typeface.DEFAULT);p.setTextAlign(Paint.Align.CENTER);p.setTextSize(size);c.drawText(s,x,y,p);}
@@ -34,15 +37,29 @@ public final class GaugeRenderer {
         text(c,UiText.t("게이지를 길게 눌러 항목 · 모양 · 위치 편집"),300,71,13,MUTED);
         p.setColor(0xff233b46);c.drawRoundRect(new RectF(650,54,788,78),5,5,p);
         text(c,layout.dense()?UiText.t("3 × 2 보기"):UiText.t("4 × 3 보기"),719,71,14,BLUE);
+        layout.pdProfile(data.pdProfile());
         Telemetry.Sample[] samples=data.snapshot(now);
+        GForceTrail.Snapshot trail=gForceTrail==null?null:gForceTrail.snapshot(now);
+        GForcePoint point=trail==null?GForcePoint.from(samples[11],samples[12]):trail.current;
+        if(point==null)point=GForcePoint.from(null,null);
         for(int slot=0;slot<layout.count();slot++){
-            int i=layout.signal(slot),style=layout.style(slot);Telemetry.Sample s=samples[i];
+            int i=layout.signal(slot),style=layout.displayStyle(slot);Telemetry.Sample s=samples[i];
             String u=torqueUnit.unit(i);float l=layout.left(slot),t=layout.top(slot),cx=l+layout.width()/2;
             // Scale the same card design uniformly; dense cards remain centered in their wider cell.
             int cardSave=c.save();float scale=layout.dense()?124f/190:1;
             c.translate(cx-126*scale,t);c.scale(scale,scale);l=0;t=0;cx=126;
             p.setStyle(Paint.Style.FILL);p.setColor(0xff101920);c.drawRoundRect(new RectF(l,t,l+252,t+190),10,10,p);
             p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1);p.setColor(LINE);c.drawRoundRect(new RectF(l,t,l+252,t+190),10,10,p);p.setStyle(Paint.Style.FILL);
+            if(style==GaugeLayout.STYLE_GFORCE){
+                text(c,"G-FORCE · 2D",cx,25,17,BLUE);
+                gForcePlot.draw(c,trail,point,72,105,55,4,2.5f);
+                text(c,point.clipped?">1 G":"±1 G",72,181,11,MUTED);
+                text(c,"LAT",184,67,11,MUTED);
+                text(c,gForceValue(point.lateralValid,point.lateralG),184,92,20,WHITE);
+                text(c,"LONG",184,121,11,MUTED);
+                text(c,gForceValue(point.longitudinalValid,point.longitudinalG),184,146,20,WHITE);
+                c.restoreToCount(cardSave);continue;
+            }
             text(c,UiText.t(Telemetry.LABELS[i]),cx,t+25,17,BLUE);
             boolean ok=s.valid&&!Float.isNaN(s.value)&&!Float.isInfinite(s.value);
             float displayed=torqueUnit.displayValue(i,s.value);
@@ -66,5 +83,8 @@ public final class GaugeRenderer {
             c.restoreToCount(cardSave);
         }
         c.restoreToCount(save);
+    }
+    private static String gForceValue(boolean valid,float value){
+        return valid?String.format(Locale.US,"%+.2f G",value):"— G";
     }
 }

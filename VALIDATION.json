@@ -93,18 +93,18 @@
     "v11_rebuilt_manifest_and_resources_match": true,
     "new_vehicle_or_emulator_test": false
   },
-  "versioning_update_date": "2026-11-10",
+  "versioning_update_date": "2026-11-11",
   "current_release": {
-    "pd_version": "1.1.0",
-    "version_name": "1.1.0-pd",
-    "version_code": 13,
-    "apk": "apks/i30-PD-Dashboard-v1.1.0-API17.apk",
-    "apk_sha256": "f39567fb35db512b9963e06b5ca973e8f0609ba6e4936ae8be25be8886f12a05",
-    "checks": "Offline API17/V1 signature/alignment/package/version checks,16 Java programs,45 Python tests and emulator synthetic-input display/settings tests",
+    "pd_version": "1.2.0",
+    "version_name": "1.2.0-pd",
+    "version_code": 21,
+    "apk": "apks/i30-PD-Dashboard-v1.2.0-API17.apk",
+    "apk_sha256": "ab52c385496e90fa9affa5384bc41ec022f85e1763da4189a15a0a67d56ab119",
+    "checks": "API17/V1 signature/alignment,26 Java programs,45 Python tests,translations,synthetic speed receiver and GPS location-provider runtime checks",
     "vehicle_install_observed": false,
     "vehicle_update_or_settings_retention_tested": false,
     "emulator_test_performed": true,
-    "provenance": "docs/PD_1.1.0_BUILD_PROVENANCE.json"
+    "provenance": "docs/PD_1.2.0_BUILD_PROVENANCE.json"
   },
   "pd_1_0_0_checks": {
     "pd_version": "1.0.0",
@@ -144,5 +144,17 @@
       "fixture_stopped_normal_relaunch"
     ],
     "new_vehicle_or_cold_boot_validation": false
+  },
+  "pd_1_1_0_checks": {
+    "pd_version": "1.1.0",
+    "version_name": "1.1.0-pd",
+    "version_code": 13,
+    "apk": "apks/i30-PD-Dashboard-v1.1.0-API17.apk",
+    "apk_sha256": "f39567fb35db512b9963e06b5ca973e8f0609ba6e4936ae8be25be8886f12a05",
+    "checks": "Offline API17/V1 signature/alignment/package/version checks,16 Java programs,45 Python tests and emulator synthetic-input display/settings tests",
+    "vehicle_install_observed": false,
+    "vehicle_update_or_settings_retention_tested": false,
+    "emulator_test_performed": true,
+    "provenance": "docs/PD_1.1.0_BUILD_PROVENANCE.json"
   }
 }
