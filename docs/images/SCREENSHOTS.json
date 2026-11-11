@@ -1,0 +1,99 @@
+{
+  "release": "1.2.0",
+  "released_apk_sha256": "ab52c385496e90fa9affa5384bc41ec022f85e1763da4189a15a0a67d56ab119",
+  "scope": "Project-produced development/verification screenshots; all displayed vehicle and GPS inputs are synthetic. Not real driving performance or calibrated measurement evidence.",
+  "image_rights": "Project app UI captures. No upstream/OEM documentation screenshots copied.",
+  "screenshots": [
+    {
+      "file": "overview.png",
+      "sha256": "2d4ddf99665ff99e4182cbaf10f3cd09052c0a1def67bf64ec6f469d4d1087b3",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 21,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false
+    },
+    {
+      "file": "f1.png",
+      "sha256": "8589871fb16173a16170443d2b668ce9ad776139e72b68f8402a74d45683ab5a",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 21,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false
+    },
+    {
+      "file": "gauges.png",
+      "sha256": "de7b9000f53bf16183588c91a4184e80924768488dc05adf34c515375535994f",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 21,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false
+    },
+    {
+      "file": "graphs.png",
+      "sha256": "8fb5bd7f1800eebe84b9012d6444177d8d62a8eba3e48a045616526507f23622",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 21,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false
+    },
+    {
+      "file": "gforce-expanded.png",
+      "sha256": "5bc83ebf7d375cbefbd5ed888334cc20c39b19af8f7d78c3f250a13fb7b8b221",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 21,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false
+    },
+    {
+      "file": "acceleration.png",
+      "sha256": "4c1d3911f1626333bdf37f55c51288981767fb9f53075d46b239d8f28a6dba12",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 20,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false,
+      "note": "Acceleration screen from the v1.2.0 development build20; acceleration UI and timer/receiver logic are unchanged in released build21."
+    },
+    {
+      "file": "lap-timer.png",
+      "sha256": "4c3a84c1a43dd3de00ccf2962dceb244e2203ee069de96a00c38afc4a80b10d7",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 21,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false
+    },
+    {
+      "file": "circuit-selection.png",
+      "sha256": "34a2c28a8cb8d074c7c6cbec4375561846169389884c3be9d955b33af40e6eec",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 21,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false
+    },
+    {
+      "file": "torque-settings.png",
+      "sha256": "1384d248eeadd06bd3823625dbc640a84a0af7711d041261045f2be5885b3457",
+      "width": 800,
+      "height": 480,
+      "app_version_name": "1.2.0-pd",
+      "internal_build": 21,
+      "source": "QEMU/API17 native framebuffer with synthetic inputs",
+      "pixels_altered": false
+    }
+  ]
+}

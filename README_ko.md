@@ -1,8 +1,90 @@
 # i30 PD Dashboard
 
-[reikop/veloster-n-dashboard](https://github.com/reikop/veloster-n-dashboard)를 기반으로 i30 PD에 맞춰 수정한 비공식 대시보드입니다. [English](README.md)
+[English](README.md) | **한국어**
+
+[reikop/veloster-n-dashboard](https://github.com/reikop/veloster-n-dashboard)를 기반으로 i30 PD에 맞춰 수정한 비공식 대시보드입니다.
 
 원본 커밋 이력과 [MIT LICENSE](LICENSE)를 유지하며 [NOTICE](NOTICE.md)에 출처·외부 의존성을 기재했습니다. 현재 파일 트리에는 PD용 문서만 제공합니다. 원작자의 설명·검증 문서와 사진·미리보기 이미지는 중복 게시하지 않으며 [원본 저장소](https://github.com/reikop/veloster-n-dashboard)에서 확인할 수 있습니다.
+
+## 기능 미리보기
+
+[전체 조망](#feature-overview) · [F1 계기판](#feature-f1) · [편집 가능한 게이지](#feature-gauges) · [시계열 그래프](#feature-graphs) · [확대 G-Force](#feature-expandedgforce) · [가속 측정](#feature-accel) · [랩 타이머](#feature-lap) · [서킷·코스 선택](#feature-circuit) · [표시 설정](#feature-settings)
+
+아래 화면은 v1.2.0을 QEMU/API17 에뮬레이터에서 실행한 모습이며, 표시값은 합성 입력입니다. 실차 주행 성능이나 계측 정확도를 증명하는 사진은 아닙니다. 미수신·미지원 항목은 `-`로 표시됩니다. 화면은 한국어 앱 UI이며 두 README에서 같은 이미지를 사용합니다.
+
+<a id="feature-overview"></a>
+
+### 전체 조망
+
+<img src="docs/images/overview.png" alt="전체 조망 — i30 PD Dashboard 1.2.0" width="800">
+
+RPM·속도·온도·공기압 등 여러 수신 항목을 한 화면에서 확인합니다.
+
+<a id="feature-f1"></a>
+
+### F1 계기판
+
+<img src="docs/images/f1.png" alt="F1 계기판 — i30 PD Dashboard 1.2.0" width="800">
+
+RPM·속도·기어와 변속 안내를 크게 보고, 하단 버튼으로 목표 RPM을 조절합니다.
+
+<a id="feature-gauges"></a>
+
+### 편집 가능한 게이지
+
+<img src="docs/images/gauges.png" alt="편집 가능한 게이지 — i30 PD Dashboard 1.2.0" width="800">
+
+게이지를 길게 눌러 표시 항목·모양·위치를 바꾸고 G-force 2D도 배치합니다.
+
+<a id="feature-graphs"></a>
+
+### 시계열 그래프
+
+<img src="docs/images/graphs.png" alt="시계열 그래프 — i30 PD Dashboard 1.2.0" width="800">
+
+항목별 변화 이력을 1분 또는 5분 범위로 보고, 그래프를 길게 눌러 항목을 바꿉니다.
+
+<a id="feature-expandedgforce"></a>
+
+### 확대 G-Force
+
+<img src="docs/images/gforce-expanded.png" alt="확대 G-Force — i30 PD Dashboard 1.2.0" width="800">
+
+F1의 G-Force를 눌러 ±1 G 그래프와 궤적을 확대하고, 원을 길게 눌러 기록을 지웁니다.
+
+<a id="feature-accel"></a>
+
+### 가속 측정
+
+<img src="docs/images/acceleration.png" alt="가속 측정 — i30 PD Dashboard 1.2.0" width="800">
+
+시작·목표 속도를 고른 뒤 중앙을 눌러 준비하거나 취소하고, 완료 시간을 왼쪽 기록에서 확인합니다.
+
+<a id="feature-lap"></a>
+
+### 랩 타이머
+
+<img src="docs/images/lap-timer.png" alt="랩 타이머 — i30 PD Dashboard 1.2.0" width="800">
+
+수동 랩 또는 GPS 추정 · 10m를 선택해 최고·직전 시간과 완료된 랩 기록을 확인합니다.
+
+<a id="feature-circuit"></a>
+
+### 서킷·코스 선택
+
+<img src="docs/images/circuit-selection.png" alt="서킷·코스 선택 — i30 PD Dashboard 1.2.0" width="800">
+
+왼쪽 서킷 목록과 코스 번호를 누르면 선택이 즉시 반영되고 원본 COURSE 링크 지도가 바뀝니다.
+
+<a id="feature-settings"></a>
+
+### 표시 설정
+
+<img src="docs/images/torque-settings.png" alt="표시 설정 — i30 PD Dashboard 1.2.0" width="800">
+
+설정에서 토크 단위를 N·m 또는 kgf·m로 고르고 저장하며, 앱 표시 언어도 바꿉니다.
+
+[Read in English](README.md#feature-preview) · [맨 위로](#i30-pd-dashboard)
 
 ## 확인된 차량
 
@@ -55,3 +137,7 @@ python3 scripts/generate_translations.py --check
 ```
 
 PD 공개 변경에는 순정 펌웨어·OEM APK/ODEX 구현·복제한 OEM 그림·원시 차량 캡처·기기 식별자·개인 설정/백업·SDK 바이너리·서명 개인키를 포함하지 않았습니다. 서킷 이름·길이·좌표 등 원본의 사실 데이터를 사용하되 지도와 선택 화면은 독립적으로 그리며, [NOTICE](NOTICE.md)에 출처를 기록했습니다. 컴파일용 최소 OEM 선언은 DEX에 넣지 않습니다. 대시보드 수신은 ECU 진단·제어 명령을 추가 송신하지 않습니다. My Apps의 명시적 설정/미디어 조작은 별도 동작입니다.
+
+---
+
+[English](README.md) | **한국어**

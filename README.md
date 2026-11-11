@@ -1,8 +1,90 @@
 # i30 PD Dashboard
 
-Unofficial i30 PD adaptation of [reikop/veloster-n-dashboard](https://github.com/reikop/veloster-n-dashboard). [한국어](README_ko.md)
+**English** | [한국어](README_ko.md)
+
+Unofficial i30 PD adaptation of [reikop/veloster-n-dashboard](https://github.com/reikop/veloster-n-dashboard).
 
 This fork adds a PD-specific receive decoder and dashboard presentation. Original commits, the unchanged [MIT LICENSE](LICENSE), and upstream notices are retained. Only PD-specific project documentation is included in the current tree. Original author documentation and screenshots are available in the [upstream repository](https://github.com/reikop/veloster-n-dashboard), rather than duplicated here.
+
+## Feature preview
+
+[Overview](#feature-overview) · [F1 dashboard](#feature-f1) · [Editable gauges](#feature-gauges) · [Signal history](#feature-graphs) · [Expanded G-force](#feature-expandedgforce) · [Acceleration test](#feature-accel) · [Lap timer](#feature-lap) · [Circuit and course selection](#feature-circuit) · [Display settings](#feature-settings)
+
+These screenshots show v1.2.0 in the QEMU/API17 emulator with synthetic inputs. They do not establish real-vehicle performance or measurement accuracy. Missing or unsupported readings remain `-`. The app screens are in Korean; descriptions are translated below.
+
+<a id="feature-overview"></a>
+
+### Overview
+
+<img src="docs/images/overview.png" alt="Overview — i30 PD Dashboard 1.2.0" width="800">
+
+View received RPM, speed, temperatures, tire pressures and other signals together.
+
+<a id="feature-f1"></a>
+
+### F1 dashboard
+
+<img src="docs/images/f1.png" alt="F1 dashboard — i30 PD Dashboard 1.2.0" width="800">
+
+Read RPM, speed, gear and shift guidance at a glance, and adjust the target RPM with the lower buttons.
+
+<a id="feature-gauges"></a>
+
+### Editable gauges
+
+<img src="docs/images/gauges.png" alt="Editable gauges — i30 PD Dashboard 1.2.0" width="800">
+
+Hold a gauge to change its signal, style or position, including a G-force 2D plot.
+
+<a id="feature-graphs"></a>
+
+### Signal history
+
+<img src="docs/images/graphs.png" alt="Signal history — i30 PD Dashboard 1.2.0" width="800">
+
+View one or five minutes of signal history, and hold a graph to choose its signal.
+
+<a id="feature-expandedgforce"></a>
+
+### Expanded G-force
+
+<img src="docs/images/gforce-expanded.png" alt="Expanded G-force — i30 PD Dashboard 1.2.0" width="800">
+
+Tap the F1 G-force plot to enlarge its ±1 G range and trail; hold the circle to clear its history.
+
+<a id="feature-accel"></a>
+
+### Acceleration test
+
+<img src="docs/images/acceleration.png" alt="Acceleration test — i30 PD Dashboard 1.2.0" width="800">
+
+Choose start and target speeds, tap the center to arm or cancel, and review completed times in the left-hand list.
+
+<a id="feature-lap"></a>
+
+### Lap timer
+
+<img src="docs/images/lap-timer.png" alt="Lap timer — i30 PD Dashboard 1.2.0" width="800">
+
+Choose manual laps or GPS estimate · 10 m, and review best, previous and completed lap times.
+
+<a id="feature-circuit"></a>
+
+### Circuit and course selection
+
+<img src="docs/images/circuit-selection.png" alt="Circuit and course selection — i30 PD Dashboard 1.2.0" width="800">
+
+Select a circuit on the left and a numbered course to apply it immediately and update the map drawn from source COURSE links.
+
+<a id="feature-settings"></a>
+
+### Display settings
+
+<img src="docs/images/torque-settings.png" alt="Display settings — i30 PD Dashboard 1.2.0" width="800">
+
+Choose and save N·m or kgf·m for torque, and change the app display language in Settings.
+
+[한국어로 보기](README_ko.md#기능-미리보기) · [Back to top](#i30-pd-dashboard)
 
 ## Confirmed target and scope
 
@@ -55,3 +137,7 @@ python3 scripts/generate_translations.py --check
 ```
 
 No OEM firmware, APK/ODEX implementations, copied OEM artwork, raw vehicle captures, device identifiers, personal settings/backups, SDK binaries or signing keys are added by this PD publication. The circuit catalog contains factual source names, lengths and coordinates; maps and controls are independently rendered. [NOTICE](NOTICE.md) records their provenance. Compile-only OEM declarations are excluded from the app DEX. Receive-only telemetry does not send ECU diagnostic/control commands; explicit My Apps settings/media actions have separate behavior. This is an unofficial research project.
+
+---
+
+**English** | [한국어](README_ko.md)
