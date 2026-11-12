@@ -2,6 +2,11 @@
 
 This file covers the PD adaptation against upstream/fork baseline `2be141b` (2026-10-26 UI release). The original seven commits are ancestors of this branch. Upstream's later optional Performance dashboard commit is not included in this PD change. Dates describe development, validation or repository work as stated, not GitHub Release publication dates. PD now uses an independent MAJOR.MINOR.PATCH series; historical v7–v11 labels remain as evidence identifiers.
 
+## Unreleased — patch for 1.2.0
+
+- Suppress calculated PD torque and power when a new engine receipt reports zero RPM. Previously, nonzero torque-ratio fields could produce a torque number with the engine stopped. Both derived readings now become unavailable (`-`) immediately; fresh positive RPM restores the ordinary calculation, including idle while parked.
+- Added model and display-path regression checks for running → stopped → idle. No vehicle-speed threshold or fabricated zero torque is used. This is a source patch; the published v1.2.0 APK and release remain unchanged.
+
 ## i30 PD 1.2.0 — 2026-11-11
 
 - Added PD G-force 2D gauges and expandable F1 plots with shared received-point history. Set the circular range to ±1 G and display positive longitudinal acceleration below center for weight transfer. Numeric readings retain their received signs.
