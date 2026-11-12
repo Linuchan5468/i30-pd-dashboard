@@ -1,4 +1,5 @@
 import com.veloster.vehicle.PdPowertrain;
+import com.veloster.vehicle.Telemetry;
 
 /** Source-driven PD calculations, temporal pairing and unit conversion boundaries. */
 public final class PdPowertrainTest {
@@ -15,6 +16,20 @@ public final class PdPowertrainTest {
         r=p.receive(9,std(20),200);check(!r.torqueUpdated&&!r.boostUpdated,"standard alone does not publish");
         r=p.receive(8,rpm(),250);check(r.torqueValid&&r.torqueAt==200,"oldest actual source timestamp");
         near(r.torqueNm,100,"50percent of200Nm");near(r.powerPs,42.7137728f,"3000rpm100Nm converted to metric horsepower");
+        byte[] stopped=rpm();stopped[2]=0;stopped[3]=0;
+        r=p.receive(8,stopped,260);
+        check(r.torqueUpdated&&!r.torqueValid,"zero RPM invalidates torque and power despite nonzero torque ratios");
+        r=p.receive(8,rpm(),270);check(r.torqueValid,"fresh positive RPM resumes derived values");
+        byte[] idle=rpm();idle[2]=(byte)0xb8;idle[3]=0x0b;
+        check(p.receive(8,idle,280).torqueValid,"750 RPM idle retains torque without a vehicle-speed gate");
+        Telemetry telemetry=new Telemetry();
+        telemetry.hscanPd(0xc7,9,std(20),200);
+        telemetry.hscanPd(0xc7,8,rpm(),250);
+        check(telemetry.sample(Telemetry.TORQUE,250).valid&&telemetry.sample(Telemetry.POWER,250).valid,"running received pair reaches display");
+        telemetry.hscanPd(0xc7,8,stopped,260);
+        check(!telemetry.sample(Telemetry.TORQUE,260).valid&&!telemetry.sample(Telemetry.POWER,260).valid,"zero RPM clears old display values immediately");
+        telemetry.hscanPd(0xc7,8,idle,280);
+        check(telemetry.sample(Telemetry.TORQUE,280).valid&&telemetry.sample(Telemetry.POWER,280).valid,"idle display resumes from fresh input");
         byte[] b=rpm();b[1]=0;b[5]=(byte)128;r=p.receive(8,b,300);
         near(r.torqueNm,-100,"negative net torque retained");near(r.powerPs,-42.7137728f,"negative power retained");
         r=p.receive(8,rpm(),2068);check(r.torqueValid&&r.torqueAt==200,"observed1868ms multiplex gap retains original source age");

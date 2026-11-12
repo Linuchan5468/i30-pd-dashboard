@@ -64,7 +64,9 @@ public final class PdPowertrain {
         if(function==8){
             int rpmRaw=(b[2]&255)|((b[3]&255)<<8),acor=b[1]&255,friction=b[5]&255;
             if(!standardSeen||!pair(now,standardAt,STANDARD_MAX_AGE_MS)||(b[0]&0xb2)!=0
-                    ||rpmRaw==65535||acor==255||friction==255)return torque(false,0,0,now);
+                    ||rpmRaw==0||rpmRaw==65535||acor==255||friction==255)return torque(false,0,0,now);
+            // A received zero RPM cannot establish combustion torque. Invalidate
+            // both derived values instead of displaying retained ECU ratios.
             // ACOR and friction are percentages of the same received standard torque.
             float net=(float)((acor-friction)*0.390625*standardNm/100.0);
             float power=(float)(net*(rpmRaw*0.25)*2*Math.PI/60/735.49875);
