@@ -6,6 +6,8 @@
 
 원본 커밋 이력과 [MIT LICENSE](LICENSE)를 유지하며 [NOTICE](NOTICE.md)에 출처·외부 의존성을 기재했습니다. 현재 파일 트리에는 PD용 문서만 제공합니다. 원작자의 설명·검증 문서와 사진·미리보기 이미지는 중복 게시하지 않으며 [원본 저장소](https://github.com/reikop/veloster-n-dashboard)에서 확인할 수 있습니다.
 
+차량 데이터의 출처와 수신 경로, 바이트·비트 환산식은 [PD 데이터 수집과 매핑](docs/PD_DATA_MAPPING_ko.md)에 정리했습니다. 순정 PD 파서·공개 CAN 정의·실차 대조를 구분하고, 계산값과 미지원 항목의 한계도 설명합니다.
+
 ## 기능 미리보기
 
 [전체 조망](#feature-overview) · [F1 계기판](#feature-f1) · [편집 가능한 게이지](#feature-gauges) · [시계열 그래프](#feature-graphs) · [확대 G-Force](#feature-expandedgforce) · [가속 측정](#feature-accel) · [랩 타이머](#feature-lap) · [서킷·코스 선택](#feature-circuit) · [표시 설정](#feature-settings)

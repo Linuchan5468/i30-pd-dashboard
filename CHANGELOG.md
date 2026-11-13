@@ -4,6 +4,7 @@ This file covers the PD adaptation against upstream/fork baseline `2be141b` (202
 
 ## Unreleased — patch for 1.2.0
 
+- Documented PD data-mapping provenance, the receive-only HSCAN path, byte/bit conversions, derived torque/power/boost and evidence limits in Korean and English, linked from both READMEs and the validation guide. Documentation only; no APK or release change.
 - Suppress calculated PD torque and power when a new engine receipt reports zero RPM. Previously, nonzero torque-ratio fields could produce a torque number with the engine stopped. Both derived readings now become unavailable (`-`) immediately; fresh positive RPM restores the ordinary calculation, including idle while parked.
 - Added model and display-path regression checks for running → stopped → idle. No vehicle-speed threshold or fabricated zero torque is used. This is a source patch; the published v1.2.0 APK and release remain unchanged.
 
