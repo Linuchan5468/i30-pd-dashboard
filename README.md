@@ -6,6 +6,8 @@ Unofficial i30 PD adaptation of [reikop/veloster-n-dashboard](https://github.com
 
 This fork adds a PD-specific receive decoder and dashboard presentation. Original commits, the unchanged [MIT LICENSE](LICENSE), and upstream notices are retained. Only PD-specific project documentation is included in the current tree. Original author documentation and screenshots are available in the [upstream repository](https://github.com/reikop/veloster-n-dashboard), rather than duplicated here.
 
+Data sources, the receive path and byte/bit conversions are documented in [PD data collection and mapping](docs/PD_DATA_MAPPING.md). It distinguishes factory PD parser evidence, public CAN references and vehicle observations, including the limits of calculated and unsupported values.
+
 ## Feature preview
 
 [Overview](#feature-overview) · [F1 dashboard](#feature-f1) · [Editable gauges](#feature-gauges) · [Signal history](#feature-graphs) · [Expanded G-force](#feature-expandedgforce) · [Acceleration test](#feature-accel) · [Lap timer](#feature-lap) · [Circuit and course selection](#feature-circuit) · [Display settings](#feature-settings)

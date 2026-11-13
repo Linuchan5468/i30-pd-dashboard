@@ -1,5 +1,7 @@
 # PD validation scope
 
+For mapping sources, the local-socket receive path, byte/bit conversions and derived-value policies, see [PD data collection and mapping](PD_DATA_MAPPING.md) / [한국어](PD_DATA_MAPPING_ko.md).
+
 Target: one Korean i30 PD N Line DCT7 / Gen5 API17 / `pd_kr` / `eng.vmadmin.20260114.084130`. No year, engine, regional or firmware-wide compatibility is inferred. Initial evidence dates are2026-10-29; public preparation is2026-11-03. Updated vehicle confirmations were supplied by the owner on2026-11-03; the dates of those later tests were not specified.
 
 ## v1.2.0 emulator and host checks — 2026-11-11
